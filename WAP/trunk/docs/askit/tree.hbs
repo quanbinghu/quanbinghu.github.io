@@ -1,0 +1,70 @@
+### 一般项目文件目录结构
+
+====
+
+项目应严格遵守此目录结构和文件命名格式。
+
+
+```text
++- my-webapp
+|  |+- pom.xml
+|  |+- src
+|  |   |+- main  #<1>
+|  |   |   |+- java
+|  |   |   |   |+- xxx.simpleapp  #<2>
+|  |   |   |   |   |+- module1  #<3>
+|  |   |   |   |   |   |+- controller
+|  |   |   |   |   |   |   |+- Demo1Controller
+|  |   |   |   |   |   |   |+- Demo2Controller
+|  |   |   |   |   |   |+- entity
+|  |   |   |   |   |   |   |+- Demo1Entity
+|  |   |   |   |   |   |   |+- Demo2Entity
+|  |   |   |   |   |   |+- repository
+|  |   |   |   |   |   |   |+- Demo1Repository
+|  |   |   |   |   |   |   |+- Demo2Repository
+|  |   |   |   |   |   |+- service
+|  |   |   |   |   |   |   |+- module1Service
+|  |   |   |   |   |+- module2
+|  |   |   |+- resources  #<4>
+|  |   |   |   |+- lang  #<5>
+|  |   |   |   |+- properties  #<6>
+|  |   |   |   |+- spring  #<7>
+|  |   |   |+- webapp   #<8>
+|  |   |   |   |+- app  #<9>
+|  |   |   |   |   |+- module1
+|  |   |   |   |   |+- module2
+|  |   |   |   |+- assets  #<10>
+|  |   |   |   |   |+- auikit
+|  |   |   |   |   |+- *.css
+|  |   |   |   |   |+- *.css
+|  |   |   |   |+- logs  #<11>
+|  |   |   |   |   |+- log.xxx.txt
+|  |   |   |   |   |+- log.xxx2.txt
+|  |   |   |   |+- WEB-INF 
+|  |   |   |   |   |+- web.xml
+|  |   |   |   |+- index.html
+|  |   |   |   |+- login.html
+|  |   |+- test  #<12>
+|  |   |   |+- java  #<13>
+|  |   |   |+- resources  #<14>
+|  |+- target  #<15>
+```
+
+<1> 主原文件根目录
+<2> java包根路径
+<3> 各个子模块根路径，下面包括模块自己的controller，entity，repository等包，注意命名规范
+<4> 项目配置相关文件根目录
+<5> 多语言文件
+<6> 属性文件，所有的配置值存储文件
+<7> spring配置文件
+<8> 项目静态根目录
+<9> 对应的前端项目根目录
+<10> 前端依赖的静态资源根目录，包括css和js等
+<11> 日志生成目录，可以通过权限控制来是否可以在线查看
+<12> 单元测试根目录
+<13> 单元测试java代码根目录，包路径与main相同
+<14> 单元测试配置根目录，包路径与main相同
+<15> maven生成后项目的目标路径，比如war文件，编译后的class文件等
+
+
+====

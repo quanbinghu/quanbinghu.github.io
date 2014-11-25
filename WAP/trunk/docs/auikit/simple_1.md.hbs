@@ -1,0 +1,173 @@
+###  视图部分
+
+
+NOTE: 视图部分的源码,  请留意注释内容
+
+```html
+<!--申明与此view对应的controller-->
+<div ng-controller="DemoCtrl">
+    <!--panel   开始-->
+    <div class="panel panel-default">
+        <!--panel头  开始-->
+        <div class="panel-heading">
+            <!--panel标题-->
+            <h4 class="panel-title ellipsis"><i class="fa fa-dot-circle-o"></i> Demo表的操作实例</h4>
+            <!--工具栏  开始-->
+            <div class="panel-toolbar text-right">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-primary hint--bottom" data-hint="添加新数据"
+                            ng-click="createItem()"><i class="fa fa-plus"></i> 添加
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger hint--bottom" data-hint="批量删除数据"
+                            ng-click="deleteBatchItem()"><i class="fa fa-minus"></i> 删除
+                    </button>
+                    <button type="button" class="btn btn-sm btn-default" auikit-tooltip title="重置查询条件并刷新数据"
+                            ng-click="refreshItem()"><i class="fa fa-refresh"></i> 刷新
+                    </button>
+                </div>
+            </div>
+            <!--工具栏  结束-->
+        </div>
+        <!--panel头  结束-->
+
+        <!--panel查询区  开始-->
+        <div class="panel-toolbar-wrapper">
+            <div class="panel-toolbar">
+                <!--查询表单-->
+                <form class="form-inline search_form" role="form">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">姓名</div>
+                            <!--查询字段name，注意字段名字写法  name_value-->
+                            <input class="form-control" type="text" placeholder="请输入姓名" name="name_value">
+                            <input type="hidden" name="name_type" value="{{name_type||'eq'}}">
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{name_type_str||'等于'}} <span class="caret"></span></button>
+                                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                    <li><a href="javascript:void(0)" ng-click="name_type_str='等于'; name_type='eq'">等于</a></li>
+                                    <li><a href="javascript:void(0)" ng-click="name_type_str='模糊'; name_type='like'">模糊</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">备注</div>
+                            <input class="form-control" type="text" placeholder="请输入备注" name="text_value">
+                            <input type="hidden" name="text_type" value="{{text_type||'eq'}}">
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{text_type_str||'等于'}} <span class="caret"></span></button>
+                                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                    <li><a href="javascript:void(0)" ng-click="text_type_str='等于'; text_type='eq'">等于</a></li>
+                                    <li><a href="javascript:void(0)" ng-click="text_type_str='模糊'; text_type='like'">模糊</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" ng-click="searchItem()"><i class="fa fa-search"></i> 查询
+                    </button>
+                </form>
+
+            </div>
+        </div>
+        <!--panel查询区  结束-->
+
+        <!--panel内容区 开始-->
+        <div class="panel-body">
+            <table class="table   table-bordered  table-hover" auikit-table data-maxheight="200"> #<1>
+                <thead>
+                <tr>
+                    <th class="" width="20px">
+                        <label class="color-cr"> #<2>
+                            <input type="checkbox" class="event-checklist" title="全选/不选">
+                            <span></span>
+                        </label>
+                    </th>
+                    <th class="" width="500px">ID</th>
+                    <th class=" sorting event-sorting" width="200px" data-field="name"> #<3>
+                        名称 <i class="sort fa fa-arrows-v"></i><i class="asc fa  fa-long-arrow-up"></i><i class="desc fa  fa-long-arrow-down"></i>
+                    </th>
+                    <th class="">备注</th>
+                    <th class="center" width="150px">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="nganimate" ng-repeat="item in data">
+                    <td class="center">
+                        <!--多选-->
+                        <label class="color-cr">
+                            <input type="checkbox" data-id="{{item.id}}">
+                            <span></span>
+                        </label>
+                    </td>
+                    <td class=" ">{{item.id}}</td>
+                    <td class="">{{item.name}}</td>
+                    <td class=" ">{{item.text}}</td>
+                    <td class="center ">
+                        <button type="button" class="btn btn-default btn-sm" ng-click="editItem(item)"><i class="fa fa-pencil"></i> 修改</button>
+                        <button type="button" class="btn btn-default btn-sm" ng-click="deleteItem(item.id)"><i class="fa fa-minus"></i> 删除</button>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+        <!--panel内容区  结束-->
+
+        <!--panel底部-->
+        <div class="panel-footer">
+            <ul class="pagination"></ul> #<4>
+        </div>
+
+    </div>
+
+    <!-- 弹出表单 -->
+    <div class="modal fade sign-3D edit_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content" auikit-draggable data-handle=".modal-header">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">数据编辑</h4>
+                </div>
+                <div class="modal-body ">
+                    <form class="form-horizontal " method="get">
+                        <input type="hidden" name="id"/>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">名称：</label>
+
+                            <div class="col-sm-10">
+                                <input type="text" name="name" class="form-control borderless" required> #<5>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">备注：</label>
+
+                            <div class="col-sm-10">
+                                <input type="text" name="text" class="form-control borderless" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="b1" type="button" class="btn-ani btn btn-primary" data-loading-type="zoom-out"
+                            data-success-text="操作成功 :)" data-error-text="操作失败 (:" data-loading-text="Loading..."
+                            ng-click="saveItem($event)"> #<6>
+                        <span>确认保存</span> <i class="ion-loading-b"></i>
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+```
+
+<1> 使用固定表头
+<2> 多选按钮
+<3> 排序，固定写法
+<4> 分页,  注意必须使用  `<ul class="pagination"></ul>`  固定格式
+<5> `borderless` 输入框只显示下边框线
+<6> 动态按钮, 固定格式
+

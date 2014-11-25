@@ -1,0 +1,2804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="WAP Document">
+<meta name="keywords" content="WAP">
+<meta name="author" content="Aliencode">
+<title>ASKIT后台服务开发包</title>
+<link rel="stylesheet" href="share/foundation-lime.css">
+<link rel="stylesheet" href="share/font-awesome-4.2.0/css/font-awesome.min.css">
+<script src="share/jquery.js"></script>
+<script src="share/underscore.js"></script>
+<link rel="stylesheet" href="share/highlight-github.css">
+<script src="share/highlight.pack.js"></script>
+<script src="share/holder.js"></script>
+<script src="share/raphael-min.js"></script>
+<script src="share/flowchart.min.js"></script>
+<script src="share/sequence-diagram-min.js"></script>
+<script src="doc.js"></script>
+</head>
+<body class="book toc2 toc-left">
+
+    
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#服务发布后的接口使用规范">1. 服务发布后的接口使用规范</a>
+<ul class="sectlevel2">
+<li><a href="#基于rest服务的接口使用">1.1. 基于REST服务的接口使用</a>
+<ul class="sectlevel3">
+<li><a href="#查询数据-分页排序等">1.1.1. 查询数据，分页排序等</a>
+<ul class="sectlevel4">
+<li><a href="#一般查询">一般查询</a></li>
+<li><a href="#分页查询">分页查询</a></li>
+<li><a href="#排序查询">排序查询</a></li>
+</ul>
+</li>
+<li><a href="#添加数据-post">1.1.2. 添加数据，POST</a></li>
+<li><a href="#修改数据-put">1.1.3. 修改数据，PUT</a></li>
+<li><a href="#删除数据-delete">1.1.4. 删除数据，DELETE</a>
+<ul class="sectlevel4">
+<li><a href="#单条删除">单条删除</a></li>
+<li><a href="#多条删除">多条删除</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#接口输入报文格式">1.2. 接口输入报文格式</a></li>
+<li><a href="#接口输出报文格式">1.3. 接口输出报文格式</a>
+<ul class="sectlevel3">
+<li><a href="#多条数据-如list">1.3.1. 多条数据，如LIST</a></li>
+<li><a href="#单条数据-如一个对像或map等">1.3.2. 单条数据，如一个对像或MAP等</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#组件选型和一般规范">2. 组件选型和一般规范</a>
+<ul class="sectlevel2">
+<li><a href="#一般项目文件目录结构">2.1. 一般项目文件目录结构</a></li>
+<li><a href="#组件组成架构图">2.2. 组件组成架构图</a></li>
+<li><a href="#组件协作图">2.3. 组件协作图</a></li>
+<li><a href="#各组件技术选型">2.4. 各组件技术选型</a>
+<ul class="sectlevel3">
+<li><a href="#项目本身提供可用组件">2.4.1. 项目本身提供可用组件</a></li>
+<li><a href="#其它三方组件">2.4.2. 其它三方组件</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#spring配置">3. Spring配置</a>
+<ul class="sectlevel2">
+<li><a href="#通用配置">3.1. 通用配置</a>
+<ul class="sectlevel3">
+<li><a href="#配置验证码">3.1.1. 配置验证码</a></li>
+</ul>
+</li>
+<li><a href="#spring-通用配置">3.2. Spring 通用配置</a></li>
+<li><a href="#spring-jpa-配置">3.3. Spring JPA 配置</a></li>
+<li><a href="#spring-mvc-配置">3.4. Spring MVC 配置</a></li>
+</ul>
+</li>
+<li><a href="#web-xml-配置">4. WEB.XML 配置</a></li>
+<li><a href="#其它公共组件配置">5. 其它公共组件配置</a>
+<ul class="sectlevel2">
+<li><a href="#logback日志配置">5.1. Logback日志配置</a></li>
+<li><a href="#属性类型覆盖配置">5.2. 属性类型覆盖配置</a></li>
+</ul>
+</li>
+<li><a href="#公用组件使用">6. 公用组件使用</a>
+<ul class="sectlevel2">
+<li><a href="#验证码">6.1. 验证码</a></li>
+<li><a href="#系统监控使用及配置">6.2. 系统监控使用及配置</a>
+<ul class="sectlevel3">
+<li><a href="#pom引用">6.2.1. POM引用</a></li>
+<li><a href="#web-xml开启spring-profile">6.2.2. WEB.XML开启Spring profile</a></li>
+<li><a href="#日志输出配置">6.2.3. 日志输出配置</a></li>
+</ul>
+</li>
+<li><a href="#数据缓存使用及配置">6.3. 数据缓存使用及配置</a></li>
+<li><a href="#集合和字符处理使用实例指导">6.4. 集合和字符处理使用实例指导</a></li>
+<li><a href="#zookeeper使用及配置">6.5. Zookeeper使用及配置</a>
+<ul class="sectlevel3">
+<li><a href="#配置">6.5.1. 配置：</a></li>
+<li><a href="#使用">6.5.2. 使用：</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#控制器使用">7. 控制器使用</a>
+<ul class="sectlevel2">
+<li><a href="#pom引用-2">7.1. POM引用</a></li>
+<li><a href="#基于entity操作的控制器用法及配置">7.2. 基于Entity操作的控制器用法及配置</a>
+<ul class="sectlevel3">
+<li><a href="#重写前置-后置方法">7.2.1. 重写前置、后置方法</a></li>
+</ul>
+</li>
+<li><a href="#一般控制器用法及配置">7.3. 一般控制器用法及配置</a></li>
+<li><a href="#数据输出时指定过滤">7.4. 数据输出时指定过滤</a></li>
+<li><a href="#基于spirng的数据接收">7.5. 基于Spirng的数据接收</a>
+<ul class="sectlevel3">
+<li><a href="#接收实例">7.5.1. 接收实例</a></li>
+<li><a href="#官方参考">7.5.2. 官方参考</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#jpa数据持久接口">8. JPA数据持久接口</a>
+<ul class="sectlevel2">
+<li><a href="#pom引用-3">8.1. POM引用</a></li>
+<li><a href="#实体类entity写法">8.2. 实体类ENTITY写法</a></li>
+<li><a href="#持久接口repository的定义">8.3. 持久接口Repository的定义</a></li>
+<li><a href="#使用自定义查询语句">8.4. 使用自定义查询语句</a>
+<ul class="sectlevel3">
+<li><a href="#查询中使用分页等功能">8.4.1. 查询中使用分页等功能</a></li>
+<li><a href="#在文件中使用查询语句">8.4.2. 在文件中使用查询语句</a></li>
+</ul>
+</li>
+<li><a href="#使用spring-data-jpa查询语法">8.5. 使用spring-data-jpa查询语法</a>
+<ul class="sectlevel3">
+<li><a href="#一般实例">8.5.1. 一般实例</a></li>
+<li><a href="#官方参考-2">8.5.2. 官方参考</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#shiro权限配置">9. Shiro权限配置</a>
+<ul class="sectlevel2">
+<li><a href="#一般配置使用">9.1. 一般配置使用</a>
+<ul class="sectlevel3">
+<li><a href="#pom引用-4">9.1.1. POM引用</a></li>
+<li><a href="#spring配置-2">9.1.2. Spring配置</a></li>
+<li><a href="#权限接口配置">9.1.3. 权限接口配置</a></li>
+</ul>
+</li>
+<li><a href="#shiro权限配置说明">9.2. Shiro权限配置说明</a></li>
+<li><a href="#相关参考">9.3. 相关参考</a></li>
+</ul>
+</li>
+<li><a href="#单元测试">10. 单元测试</a>
+<ul class="sectlevel2">
+<li><a href="#pom引用-5">10.1. POM引用</a></li>
+<li><a href="#一般测试用法及配置">10.2. 一般测试用法及配置</a></li>
+<li><a href="#spring-mvc控制器测试">10.3. Spring MVC控制器测试</a></li>
+<li><a href="#数据持久接口测试-基于事务">10.4. 数据持久接口测试，基于事务</a></li>
+<li><a href="#jsonpath和matchers">10.5. JsonPath和Matchers</a></li>
+<li><a href="#test-profile">10.6. TEST PROFILE</a></li>
+<li><a href="#相关参考-2">10.7. 相关参考</a></li>
+</ul>
+</li>
+<li><a href="#参考">11. 参考</a></li>
+</ul>
+</div>
+
+<div id="header">
+<h1>ASKIT后台服务开发包</h1>
+<div class="details">
+<span id="author" class="author">Aliencode</span><br>
+<span id="email" class="email"><a href="https://github.com/aliencode">@aliencode</a></span><br>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+欢迎使用ASKIT，遇到问题请点击下面链接查看解决办法或提交新问题！  <a href="https://github.com/zlhl-dev/askit/issues" class="bare">https://github.com/zlhl-dev/askit/issues</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>ASKIT</strong> (Application Service Kit)
+支持开发基于RESTFul协议服务接口的开发套件 ！</p>
+</div>
+<div class="paragraph">
+<p>ASKIT后端应用服务框架，基于JavaEE界主流技术框架的封装和再开发而提供了更为简洁的使用方法和更加强大的基础功能。</p>
+</div>
+<div class="paragraph">
+<p>运行环境需要支持JDK7和Servlet3，构建工具采用Maven！</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="服务发布后的接口使用规范"><a class="anchor" href="#服务发布后的接口使用规范"></a>1. 服务发布后的接口使用规范</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>在服务启动后对服务提供的接口使用方法进行说明</p>
+</div>
+<div class="sect2">
+<h3 id="基于rest服务的接口使用"><a class="anchor" href="#基于rest服务的接口使用"></a>1.1. 基于REST服务的接口使用</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>对REST接口一般调用的使用方法说明，包括CRUD（增、删、改、查）操作。</p>
+</div>
+<div class="paragraph">
+<p>接口实例地址： <a href="http://localhost:8080/demo" class="bare">http://localhost:8080/demo</a></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">示例实体：</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Entity
+@Table(name = "DEMO")
+@DynamicUpdate
+@JsonFilter("exclude")
+@SuppressWarnings("serial")
+public class DemoEntity extends JpaBaseEntity{
+
+    private String name;
+
+    private String text;
+
+    private Demo2Entity demoEntity;
+    private List&lt;Demo2Entity&gt; demoEntityList;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    @OneToOne(cascade = CascadeType.ALL)
+    public Demo2Entity getDemoEntity() {
+        return demoEntity;
+    }
+
+    public void setDemoEntity(Demo2Entity demoEntity) {
+        this.demoEntity = demoEntity;
+    }
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    public List&lt;Demo2Entity&gt; getDemoEntityList() {
+        return demoEntityList;
+    }
+
+    public void setDemoEntityList(List&lt;Demo2Entity&gt; demoEntityList) {
+        this.demoEntityList = demoEntityList;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="查询数据-分页排序等"><a class="anchor" href="#查询数据-分页排序等"></a>1.1.1. 查询数据，分页排序等</h4>
+<div class="paragraph">
+<p>请求方法： <strong>GET</strong></p>
+</div>
+<div class="sect4">
+<h5 id="一般查询"><a class="anchor" href="#一般查询"></a>一般查询</h5>
+<div class="paragraph">
+<p>对接口地址发出GET请求，根据要请求格式返回数据报文，如 demo.json 或 dmeo.xml 返回相应的 josn或xml 格式的数据结果报文。</p>
+</div>
+<div class="paragraph">
+<p><strong>查询语法： </strong></p>
+</div>
+<div class="paragraph">
+<p><code>demo?search=id-eq-1&amp;search=name-eq-hello</code></p>
+</div>
+<div class="paragraph">
+<p><strong>查询条件：</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">关键字</th>
+<th class="tableblock halign-left valign-top">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">eq</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">等于</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">like</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">模糊查询</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">llike</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">左模糊查询</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rlike</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">右模糊查询</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gt</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">大于</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">lt</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">小于</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gte</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">大于等于</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">lte</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">小于等于</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+所有查询查询均会解析为 <code>与</code> 查询操作。
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="qlist qanda">
+<ol>
+<li>
+<p><em>表关系一对一如何查询？</em></p>
+<p>demo?search=demoEntity.id-eq-1&amp;search=demoEntity.name-eq-hello</p>
+</li>
+<li>
+<p><em>表关系一对一多或多对一如何查询？</em></p>
+<p>demo?search=demoEntityList.id-eq-1&amp;search=demoEntityList.name-eq-hello <br>
+<mark>注意：</mark> <code>demoEntityList</code> 如果是一对多或多对多的变量名必须以List为后缀</p>
+</li>
+</ol>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="分页查询"><a class="anchor" href="#分页查询"></a>分页查询</h5>
+<div class="literalblock">
+<div class="content">
+<pre>demo?page=1&amp;limit=10</pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">page</dt>
+<dd>
+<p>当前第几页</p>
+</dd>
+<dt class="hdlist1">limit</dt>
+<dd>
+<p>第页多少条</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect4">
+<h5 id="排序查询"><a class="anchor" href="#排序查询"></a>排序查询</h5>
+<div class="paragraph">
+<p>可对本类任意字段进行排序查询，包括关联类的字段。</p>
+</div>
+<div class="literalblock">
+<div class="title">本类字段排序</div>
+<div class="content">
+<pre>demo?sort=name&amp;name.dir=asc</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="title">一对一子类字段排序</div>
+<div class="content">
+<pre>demo?sort=demoEntity.name&amp;demoEntity.name.dir=asc</pre>
+</div>
+</div>
+<div class="literalblock">
+<div class="title">一对多或多对多子类字段排序</div>
+<div class="content">
+<pre>demo?sort=demoEntityList.name&amp;demoEntityList.name.dir=asc</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="添加数据-post"><a class="anchor" href="#添加数据-post"></a>1.1.2. 添加数据，POST</h4>
+<div class="paragraph">
+<p>语法路径： <strong>/demo</strong><br>
+请求方法： <strong>POST</strong><br>
+请求报文：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+    name: "4",
+    text: "3",
+    demo2Entity: {
+        id: "a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0"
+    },
+    demo3EntityList: [
+        {
+            id: "a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0"
+        }
+    ]
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="修改数据-put"><a class="anchor" href="#修改数据-put"></a>1.1.3. 修改数据，PUT</h4>
+<div class="paragraph">
+<p>语法路径： <strong>/demo/a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0</strong><br>
+请求方法： <strong>PUT</strong><br>
+请求报文：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+    name: "4",
+    text: "3"
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="删除数据-delete"><a class="anchor" href="#删除数据-delete"></a>1.1.4. 删除数据，DELETE</h4>
+<div class="paragraph">
+<p>删除数据包括单条和多条。</p>
+</div>
+<div class="sect4">
+<h5 id="单条删除"><a class="anchor" href="#单条删除"></a>单条删除</h5>
+<div class="paragraph">
+<p>语法路径： <strong>/demo/a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0</strong><br>
+请求方法： <strong>DELETE</strong></p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="多条删除"><a class="anchor" href="#多条删除"></a>多条删除</h5>
+<div class="paragraph">
+<p>语法路径： <strong>/demo</strong><br>
+请求方法： <strong>DELETE</strong><br>
+请求报文：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">["a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0","a3ecbb24-b9fb-4dc2-aa91-2c538392cfe3"]</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="接口输入报文格式"><a class="anchor" href="#接口输入报文格式"></a>1.2. 接口输入报文格式</h3>
+<div class="paragraph">
+<p>对接口提交数据的报文格式说明，一般分为JOSN和XML两种格式。</p>
+</div>
+<div class="exampleblock">
+<div class="title">JOSN</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+    name: "4",
+    text: "3",
+    demo2Entity: { <i class="conum" data-value="1"></i><b>(1)</b>
+        id: "a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0"
+    },
+    demo3EntityList: [   <i class="conum" data-value="2"></i><b>(2)</b>
+        {
+            id: "a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0"
+        }
+    ]
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>一对一关联后数据提交，创建和更新操作</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>多对多或一对多关联后数据提交，创建和更新操作</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>当提交的关联数据不存在时自动创建</strong>，如：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+    name: "4",
+    text: "3",
+    demo2Entity: {
+        name: "4"
+    }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+必须设置关联关系包含创建，如： <code>@OneToOne(cascade = CascadeType.ALL)</code>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="exampleblock">
+<div class="title">xml</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;item&gt;
+    &lt;name&gt;4&lt;/name&gt;
+    &lt;text&gt;3&lt;/text&gt;
+    &lt;demoEntityList/&gt;
+&lt;/item&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="接口输出报文格式"><a class="anchor" href="#接口输出报文格式"></a>1.3. 接口输出报文格式</h3>
+<div class="paragraph">
+<p>请求接口后输出的报文格式说明，包括REST协议任意请求后的输出结果。</p>
+</div>
+<div class="sect3">
+<h4 id="多条数据-如list"><a class="anchor" href="#多条数据-如list"></a>1.3.1. 多条数据，如LIST</h4>
+<div class="exampleblock">
+<div class="title">请求路径： <a href="http://localhost:8080/demo" class="bare">http://localhost:8080/demo</a></div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+    success: true, <i class="conum" data-value="1"></i><b>(1)</b>
+    data: [  <i class="conum" data-value="2"></i><b>(2)</b>
+        {
+            id: "a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0",
+            createdAt: 1411631452616,
+            updatedAt: 1411631452616,
+            createdBy: "anonymous",
+            createdByUsername: "anonymous",
+            updatedBy: "anonymous",
+            updatedByUsername: "anonymous",
+            version: "",
+            name: "4",
+            text: "3",
+            demoEntity: "",
+            demoEntityList: [ ]
+        }
+    ],
+    includeFieldNames: [ ], <i class="conum" data-value="3"></i><b>(3)</b>
+    excludeFieldNames: [ ], <i class="conum" data-value="4"></i><b>(4)</b>
+    metaData: { <i class="conum" data-value="5"></i><b>(5)</b>
+        isLast: true, <i class="conum" data-value="6"></i><b>(6)</b>
+        numberOfElements: 18, <i class="conum" data-value="7"></i><b>(7)</b>
+        sort: "", <i class="conum" data-value="8"></i><b>(8)</b>
+        totalElements: 18, <i class="conum" data-value="9"></i><b>(9)</b>
+        number: 0, <i class="conum" data-value="10"></i><b>(10)</b>
+        isFirst: true, <i class="conum" data-value="11"></i><b>(11)</b>
+        totalPages: 1, <i class="conum" data-value="12"></i><b>(12)</b>
+        size: 20 <i class="conum" data-value="13"></i><b>(13)</b>
+    },
+    errorMessage: "", <i class="conum" data-value="14"></i><b>(14)</b>
+    errorCode: "" <i class="conum" data-value="15"></i><b>(15)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>是否成功，true 成功， false 失败</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>返回的数据体，如果 success: true</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>如果实体使用了包含策略这里显示包含了哪些字段</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>如果实体使用了排除策略这里显示排除了哪些字段，一般会使用排除策略</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>此报文的附加信息体</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>是否最后一页数据</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>当前页有多少条数据</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>是否使用了排序，如果有排序则显示排序字段信息</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>此接口一共有多少条数据</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td>当前第几页，从 0 开始</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="11"></i><b>11</b></td>
+<td>是否为第一页</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="12"></i><b>12</b></td>
+<td>一共有多少页数据</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="13"></i><b>13</b></td>
+<td>每页多少条数据</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="14"></i><b>14</b></td>
+<td>错误信息，如果 success: false</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="15"></i><b>15</b></td>
+<td>错误码，如果 success: false</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="exampleblock">
+<div class="title">请求路径： <a href="http://localhost:8080/demo.xml" class="bare">http://localhost:8080/demo.xml</a></div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;result xmlns=""&gt;
+    &lt;success&gt;true&lt;/success&gt;
+    &lt;includeFieldNames/&gt;
+    &lt;excludeFieldNames/&gt;
+    &lt;metaData&gt;
+    &lt;isLast&gt;true&lt;/isLast&gt;
+    &lt;numberOfElements&gt;18&lt;/numberOfElements&gt;
+    &lt;sort/&gt;
+    &lt;totalElements&gt;18&lt;/totalElements&gt;
+    &lt;number&gt;0&lt;/number&gt;
+    &lt;isFirst&gt;true&lt;/isFirst&gt;
+    &lt;totalPages&gt;1&lt;/totalPages&gt;
+    &lt;size&gt;20&lt;/size&gt;
+    &lt;/metaData&gt;
+    &lt;errorMessage/&gt;
+    &lt;errorCode/&gt;
+    &lt;data&gt;
+        &lt;item&gt;
+            &lt;id&gt;9f30bfa0-a93a-4f12-9c13-748746b3cdbf&lt;/id&gt;
+            &lt;createdAt&gt;1413350124200&lt;/createdAt&gt;
+            &lt;updatedAt&gt;1413350124200&lt;/updatedAt&gt;
+            &lt;createdBy&gt;anonymous&lt;/createdBy&gt;
+            &lt;createdByUsername&gt;anonymous&lt;/createdByUsername&gt;
+            &lt;updatedBy&gt;anonymous&lt;/updatedBy&gt;
+            &lt;updatedByUsername&gt;anonymous&lt;/updatedByUsername&gt;
+            &lt;version/&gt;
+            &lt;name&gt;123&lt;/name&gt;
+        &lt;/item&gt;
+    &lt;/data&gt;
+&lt;/result&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+说明参考第一部分JSON段
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="单条数据-如一个对像或map等"><a class="anchor" href="#单条数据-如一个对像或map等"></a>1.3.2. 单条数据，如一个对像或MAP等</h4>
+<div class="exampleblock">
+<div class="title">请求路径：  <a href="http://localhost:8080/demo/a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0" class="bare">http://localhost:8080/demo/a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0</a></div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+    success: true,
+    data: {
+        id: "a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0",
+        createdAt: 1411631452616,
+        updatedAt: 1411631452616,
+        createdBy: "anonymous",
+        createdByUsername: "anonymous",
+        updatedBy: "anonymous",
+        updatedByUsername: "anonymous",
+        version: "",
+        name: "4",
+        text: "3",
+        demoEntity: "",
+        demoEntityList: [ ]
+    },
+    includeFieldNames: [ ],
+    excludeFieldNames: [ ],
+    metaData: {
+    totalElements: 0
+    },
+    errorMessage: "",
+    errorCode: ""
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+说明参考第一部分JSON段
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="exampleblock">
+<div class="title">请求路径：  <a href="http://localhost:8080/demo/a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0.xml" class="bare">http://localhost:8080/demo/a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0.xml</a></div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;result xmlns=""&gt;
+    &lt;success&gt;true&lt;/success&gt;
+    &lt;includeFieldNames/&gt;
+    &lt;excludeFieldNames/&gt;
+    &lt;metaData&gt;
+        &lt;totalElements&gt;0&lt;/totalElements&gt;
+    &lt;/metaData&gt;
+    &lt;errorMessage/&gt;
+    &lt;errorCode/&gt;
+    &lt;data&gt;
+    &lt;item&gt;
+        &lt;id&gt;a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0&lt;/id&gt;
+        &lt;createdAt&gt;1411631452616&lt;/createdAt&gt;
+        &lt;updatedAt&gt;1411631452616&lt;/updatedAt&gt;
+        &lt;createdBy&gt;anonymous&lt;/createdBy&gt;
+        &lt;createdByUsername&gt;anonymous&lt;/createdByUsername&gt;
+        &lt;updatedBy&gt;anonymous&lt;/updatedBy&gt;
+        &lt;updatedByUsername&gt;anonymous&lt;/updatedByUsername&gt;
+        &lt;version/&gt;
+        &lt;name&gt;4&lt;/name&gt;
+        &lt;text&gt;3&lt;/text&gt;
+        &lt;demoEntity/&gt;
+        &lt;demoEntityList/&gt;
+    &lt;/item&gt;
+    &lt;/data&gt;
+&lt;/result&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+说明参考第一部分JSON段
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="组件选型和一般规范"><a class="anchor" href="#组件选型和一般规范"></a>2. 组件选型和一般规范</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="一般项目文件目录结构"><a class="anchor" href="#一般项目文件目录结构"></a>2.1. 一般项目文件目录结构</h3>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>项目应严格遵守此目录结构和文件命名格式。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text" data-lang="text">+- my-webapp
+|  |+- pom.xml
+|  |+- src
+|  |   |+- main  <i class="conum" data-value="1"></i><b>(1)</b>
+|  |   |   |+- java
+|  |   |   |   |+- xxx.simpleapp  <i class="conum" data-value="2"></i><b>(2)</b>
+|  |   |   |   |   |+- module1  <i class="conum" data-value="3"></i><b>(3)</b>
+|  |   |   |   |   |   |+- controller
+|  |   |   |   |   |   |   |+- Demo1Controller
+|  |   |   |   |   |   |   |+- Demo2Controller
+|  |   |   |   |   |   |+- entity
+|  |   |   |   |   |   |   |+- Demo1Entity
+|  |   |   |   |   |   |   |+- Demo2Entity
+|  |   |   |   |   |   |+- repository
+|  |   |   |   |   |   |   |+- Demo1Repository
+|  |   |   |   |   |   |   |+- Demo2Repository
+|  |   |   |   |   |   |+- service
+|  |   |   |   |   |   |   |+- module1Service
+|  |   |   |   |   |+- module2
+|  |   |   |+- resources  <i class="conum" data-value="4"></i><b>(4)</b>
+|  |   |   |   |+- lang  <i class="conum" data-value="5"></i><b>(5)</b>
+|  |   |   |   |+- properties  <i class="conum" data-value="6"></i><b>(6)</b>
+|  |   |   |   |+- spring  <i class="conum" data-value="7"></i><b>(7)</b>
+|  |   |   |+- webapp   <i class="conum" data-value="8"></i><b>(8)</b>
+|  |   |   |   |+- app  <i class="conum" data-value="9"></i><b>(9)</b>
+|  |   |   |   |   |+- module1
+|  |   |   |   |   |+- module2
+|  |   |   |   |+- assets  <i class="conum" data-value="10"></i><b>(10)</b>
+|  |   |   |   |   |+- auikit
+|  |   |   |   |   |+- *.css
+|  |   |   |   |   |+- *.css
+|  |   |   |   |+- logs  <i class="conum" data-value="11"></i><b>(11)</b>
+|  |   |   |   |   |+- log.xxx.txt
+|  |   |   |   |   |+- log.xxx2.txt
+|  |   |   |   |+- WEB-INF
+|  |   |   |   |   |+- web.xml
+|  |   |   |   |+- index.html
+|  |   |   |   |+- login.html
+|  |   |+- test  <i class="conum" data-value="12"></i><b>(12)</b>
+|  |   |   |+- java  <i class="conum" data-value="13"></i><b>(13)</b>
+|  |   |   |+- resources  <i class="conum" data-value="14"></i><b>(14)</b>
+|  |+- target  <i class="conum" data-value="15"></i><b>(15)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>主原文件根目录</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>java包根路径</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>各个子模块根路径，下面包括模块自己的controller，entity，repository等包，注意命名规范</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>项目配置相关文件根目录</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>多语言文件</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>属性文件，所有的配置值存储文件</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>spring配置文件</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>项目静态根目录</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>对应的前端项目根目录</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td>前端依赖的静态资源根目录，包括css和js等</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="11"></i><b>11</b></td>
+<td>日志生成目录，可以通过权限控制来是否可以在线查看</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="12"></i><b>12</b></td>
+<td>单元测试根目录</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="13"></i><b>13</b></td>
+<td>单元测试java代码根目录，包路径与main相同</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="14"></i><b>14</b></td>
+<td>单元测试配置根目录，包路径与main相同</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="15"></i><b>15</b></td>
+<td>maven生成后项目的目标路径，比如war文件，编译后的class文件等</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="组件组成架构图"><a class="anchor" href="#组件组成架构图"></a>2.2. 组件组成架构图</h3>
+<div class="imageblock">
+<div class="content">
+<img src="imgs/askit/askit.png" alt="askit">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="组件协作图"><a class="anchor" href="#组件协作图"></a>2.3. 组件协作图</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sequence" data-lang="sequence">request-&gt;servlet:请求（doFilter）
+servlet-&gt;monitor:日志记录
+note over monitor:内存记录HTTP请求相关信息
+servlet-&gt;rest:
+rest-&gt;rest:CRUD请求处理
+rest-&gt;server:业务逻辑处理
+rest--&gt;&gt;jpa:直接走jpa数据操作
+server-&gt;jpa:数据处理
+jpa-&gt;jpa:执行数据存取操作
+jpa--&gt;&gt;rest:数据处理结果
+rest--&gt;&gt;monitor:response
+monitor-&gt;monitor:日志存储
+rest--&gt;&gt;servlet:response
+servlet--&gt;&gt;request:response</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="各组件技术选型"><a class="anchor" href="#各组件技术选型"></a>2.4. 各组件技术选型</h3>
+<div class="sect3">
+<h4 id="项目本身提供可用组件"><a class="anchor" href="#项目本身提供可用组件"></a>2.4.1. 项目本身提供可用组件</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">组件</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">功能</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">依赖组件</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">说明</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">askit-base</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">基础组件</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SpringFramework</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">系统基础组件，实现基础配置和功能提供如验证码等</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">askit-monitor</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HTTP请求记录组件</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">slf4j，logback，log4jdbc</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">可对HTTP请求的信息和本次请求所执行的数据库查询进行记录</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">askit-rest</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RESTFul服务组件</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SpringMVC</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">实现REST协议的支持，支持JSON，XML两种数据格式的输入和输出</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">askit-jpa</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">数据存储接口API</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SpringDataJPA，HibernateJPA</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">支持大量常用的数据存取接口和查询、排序、分页等功能</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">askit-shiro</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">权限控制组件</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ApacheShiro</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">对系统的安全、用户权限进行全面控制，支持分布式系统Session共享</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">askit-test</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">单元测试组件</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SpringTest，TestNg，Mockito</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">采用优秀的测试组件方便、灵活的进行各种基于Spring的单元测试并提供测试报告</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="其它三方组件"><a class="anchor" href="#其它三方组件"></a>2.4.2. 其它三方组件</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">功能</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">组件</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">备注</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">基础组件（字符、集合等扩展组件）</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">google.guava</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://code.google.com/p/guava-libraries/" class="bare">https://code.google.com/p/guava-libraries/</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">日志记录</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">slf4j（logback）</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(<a href="http://www.slf4j.org/" class="bare">http://www.slf4j.org/</a>) (<a href="http://logback.qos.ch/" class="bare">http://logback.qos.ch/</a>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JSON，XML</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jackson，fasterxml</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="http://wiki.fasterxml.com/JacksonHome" class="bare">http://wiki.fasterxml.com/JacksonHome</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">验证码</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">patchca</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://code.google.com/p/patchca/" class="bare">https://code.google.com/p/patchca/</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spring配置"><a class="anchor" href="#spring配置"></a>3. Spring配置</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="通用配置"><a class="anchor" href="#通用配置"></a>3.1. 通用配置</h3>
+<div class="paragraph">
+<p>一些公共组件的配置</p>
+</div>
+<div class="sect3">
+<h4 id="配置验证码"><a class="anchor" href="#配置验证码"></a>3.1.1. 配置验证码</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;bean id="captcha" class="cn.bgonline.askit.module.base.captcha.spring.PatchcaFactoryBean"/&gt;</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">可配置参数：</caption>
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">参数名</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">默认值</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">功能</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">width</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">图片宽度</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">height</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">28</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">图片高度</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxLength</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">验证码字符最多个数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minLength</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">验证码字符最少个数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">maxFontsize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">18</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">字符最大字体</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">minFontsize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">14</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">字符最小字体</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">margin</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">字符边距</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">characters</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">23456789ABCDEFGHGKLMNPQRSTUVWXY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">验证码字符范围</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="spring-通用配置"><a class="anchor" href="#spring-通用配置"></a>3.2. Spring 通用配置</h3>
+<div class="exampleblock">
+<div class="title">Spring一般配置</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd"
+        &gt;
+
+    &lt;description&gt;SPRING公共配置&lt;/description&gt;
+
+    &lt;context:component-scan base-package="cn.bgonline.wap.simpleapp"&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+        &lt;context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/&gt;
+    &lt;/context:component-scan&gt;
+
+    &lt;bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource"&gt;  <i class="conum" data-value="2"></i><b>(2)</b>
+        &lt;property name="basenames"&gt;
+            &lt;list&gt;
+                &lt;value&gt;lang.applicationresource&lt;/value&gt;
+                &lt;value&gt;lang.ValidationMessages&lt;/value&gt;
+            &lt;/list&gt;
+        &lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;bean id="applicationContextUtils" class="cn.bgonline.askit.module.base.spring.ApplicationContextUtils" /&gt;  <i class="conum" data-value="3"></i><b>(3)</b>
+
+    &lt;bean name="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"&gt;  <i class="conum" data-value="4"></i><b>(4)</b>
+        &lt;property name="validationMessageSource" ref="messageSource"/&gt;
+    &lt;/bean&gt;
+
+
+    &lt;bean class="cn.bgonline.askit.module.base.spring.config.BeanRefPropertyOverrideConfigurer"&gt;  <i class="conum" data-value="5"></i><b>(5)</b>
+        &lt;property name="location" value="classpath:/properties/property-override.properties"/&gt;
+        &lt;property name="ignoreInvalidKeys" value="true"/&gt;
+    &lt;/bean&gt;
+
+
+
+    &lt;!-- production环境 --&gt;
+    &lt;beans profile="production"&gt;  <i class="conum" data-value="6"></i><b>(6)</b>
+        &lt;context:property-placeholder ignore-unresolvable="true" order="0"
+                                      location="classpath*:/properties/application.properties"/&gt;
+
+        &lt;bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
+              destroy-method="close"&gt; <i class="conum" data-value="7"></i><b>(7)</b>
+            &lt;property name="url" value="${jdbc.url}"/&gt;
+            &lt;property name="username" value="${jdbc.username}"/&gt;
+            &lt;property name="password" value="${jdbc.password}"/&gt;
+            &lt;property name="filters" value="stat"/&gt;
+            &lt;property name="maxActive" value="20"/&gt;
+            &lt;property name="initialSize" value="1"/&gt;
+            &lt;property name="maxWait" value="60000"/&gt;
+            &lt;property name="minIdle" value="1"/&gt;
+            &lt;property name="timeBetweenEvictionRunsMillis" value="60000"/&gt;
+            &lt;property name="minEvictableIdleTimeMillis" value="300000"/&gt;
+            &lt;!--
+            用来检测连接是否有效的sql--&gt;
+            &lt;property name="validationQuery"&gt;
+                &lt;value&gt;SELECT 'x'&lt;/value&gt;
+            &lt;/property&gt;
+
+            &lt;property name="testWhileIdle" value="true"/&gt;
+            &lt;property name="testOnBorrow" value="false"/&gt;
+            &lt;property name="testOnReturn" value="false"/&gt;
+            &lt;property name="poolPreparedStatements" value="true"/&gt;
+            &lt;property name="maxOpenPreparedStatements" value="20"/&gt;
+        &lt;/bean&gt;
+
+    &lt;/beans&gt;
+
+    &lt;!-- local development h2 数据库环境 --&gt;
+    &lt;beans profile="developmentH2db"&gt;  <i class="conum" data-value="8"></i><b>(8)</b>
+        &lt;context:property-placeholder ignore-resource-not-found="true" order="0"
+                                      location="classpath*:/properties/application.properties,
+          			  classpath*:/properties/application.development.properties" ignore-unresolvable="true"/&gt;
+        &lt;bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource"&gt;
+            &lt;property name="driverClass" value="${jdbc.driver}"/&gt;
+            &lt;property name="url" value="${jdbc.url}"/&gt;
+            &lt;property name="username" value="${jdbc.username}"/&gt;
+            &lt;property name="password" value="${jdbc.password}"/&gt;
+        &lt;/bean&gt;
+    &lt;/beans&gt;
+
+    &lt;beans profile="test"&gt;  <i class="conum" data-value="9"></i><b>(9)</b>
+        &lt;context:property-placeholder ignore-resource-not-found="true" order="0"
+                                      location="classpath*:/properties/application.properties,
+          			  classpath*:/properties/application.test.properties"/&gt;
+
+        &lt;!-- 嵌入式内存中数据库 --&gt;
+        &lt;jdbc:embedded-database id="dataSource" type="H2"&gt;
+            &lt;!--数据结构同运行环境一至--&gt;
+            &lt;!--&lt;jdbc:script location="classpath:sql/h2/schema.sql"/&gt;--&gt;
+            &lt;!--导入测试数据，与运行环境不同，设置编码utf-8--&gt;
+            &lt;!--&lt;jdbc:script location="classpath:data/import-data.sql" encoding="utf-8"/&gt;--&gt;
+        &lt;/jdbc:embedded-database&gt;
+
+    &lt;/beans&gt;
+
+
+&lt;/beans&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>注册bean, Controller除外由mvc部分注册</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>多语言资源文件，应对文件：<code>lang/applicationresource_zh_CN.properties</code> , <code>lang/ValidationMessages_zh_CN.properties</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>ApplicationContext工具 ,例： ApplicationContextUtils.getBean("beanid")</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>JSR303 Validator定义， 支持Spring @Valid</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Spring 配置中某些bean没有使用占位符，通过bean的id和属性名重新赋值，如：xxx.xxx=xxx，如果是Bean引用：xxx.xxx.bean_ref=xxx</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Spring运行环境配置，在 <code>web.xml</code> 中指定，请参考 <code>web.xml</code> 相关配置。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>alibaba.druid连接池配置, 更多参考： <a href="https://github.com/alibaba/druid/wiki/DruidDataSource%E9%85%8D%E7%BD%AE%E5%B1%9E%E6%80%A7%E5%88%97%E8%A1%A8">DruidDataSource配置属性列表</a></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>本地开发环境配置，一般使用嵌入式数据库，不使用链接池</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>test环境，使用嵌入式内存中数据库</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="spring-jpa-配置"><a class="anchor" href="#spring-jpa-配置"></a>3.3. Spring JPA 配置</h3>
+<div class="exampleblock">
+<div class="title">Spring Data 官方参考</div>
+<div class="content">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#orm" class="bare">http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#orm</a></p>
+</li>
+<li>
+<p><a href="http://docs.spring.io/spring-data/data-commons/docs/1.8.4.RELEASE/reference/htmlsingle/" class="bare">http://docs.spring.io/spring-data/data-commons/docs/1.8.4.RELEASE/reference/htmlsingle/</a></p>
+</li>
+<li>
+<p><a href="http://docs.spring.io/spring-data/jpa/docs/1.6.4.RELEASE/reference/htmlsingle/" class="bare">http://docs.spring.io/spring-data/jpa/docs/1.6.4.RELEASE/reference/htmlsingle/</a></p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="exampleblock">
+<div class="title">Spring JPA持久化相关配置</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd"
+       &gt;
+
+    &lt;util:properties id="jpaProperties"/&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    &lt;bean id="jpaVendorAdaptor" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"&gt; <i class="conum" data-value="2"></i><b>(2)</b>
+        &lt;!--关闭Sql显示，调试时使用log4jdbc--&gt;
+        &lt;property name="showSql" value="false"/&gt;
+        &lt;!--自动建表功能，可通过构建工具实现--&gt;
+        &lt;property name="generateDdl" value="true"/&gt;
+        &lt;!--&lt;property name="database" value="HSQL"/&gt;--&gt;
+    &lt;/bean&gt;
+
+    &lt;bean id="entityManagerFactory"  class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"&gt; <i class="conum" data-value="3"></i><b>(3)</b>
+         &lt;property name="dataSource" ref="dataSource"/&gt;
+         &lt;property name="jpaVendorAdapter" ref="jpaVendorAdaptor"/&gt;
+         &lt;property name="packagesToScan" value="cn.bgonline.wap.simpleapp.**.entity"/&gt;
+         &lt;property name="jpaProperties" ref="jpaProperties"/&gt;
+        &lt;!--&lt;property name="mappingResources" value="META-INF/sqlmapping.xml"/&gt;--&gt;  <i class="conum" data-value="4"></i><b>(4)</b>
+    &lt;/bean&gt;
+    &lt;jpa:repositories <i class="conum" data-value="5"></i><b>(5)</b>
+            repository-impl-postfix="Impl"
+            base-package="cn.bgonline.wap.simpleapp.**.repository"
+            transaction-manager-ref="transactionManager"
+            entity-manager-factory-ref="entityManagerFactory"
+            factory-class="cn.bgonline.askit.module.jpa.ExtJpaRepositoryFactoryBean"
+            /&gt;
+
+    &lt;bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"&gt;
+        &lt;property name="entityManagerFactory" ref="entityManagerFactory" /&gt;
+    &lt;/bean&gt;
+
+
+    &lt;bean id="userAuditorAware" class="cn.bgonline.wap.simpleapp.account.common.UserAuditorAware" /&gt; <i class="conum" data-value="6"></i><b>(6)</b>
+    &lt;jpa:auditing auditor-aware-ref="userAuditorAware" /&gt;
+
+    &lt;tx:annotation-driven /&gt; <i class="conum" data-value="7"></i><b>(7)</b>
+
+&lt;/beans&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>JPA属性配置，不指定此属性generateDdl不生效</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>JPA实现，参数VendorAdapter，这里使用了HIBERNATE</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Spring-data-JPA实体管理者</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>将JPQL查询语句放到一个配置文件中</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>JPA持久接口配置</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>自动赋值为 @CreatedBy, @LastModifiedBy @CreatedDate and @LastModifiedDate</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>在应用层注解事务支持，注意指定事务名称：@Transactional("transactionManager-xxx")</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="spring-mvc-配置"><a class="anchor" href="#spring-mvc-配置"></a>3.4. Spring MVC 配置</h3>
+<div class="exampleblock">
+<div class="title">Spring mvc 一般配置</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd"
+       &gt;
+
+	<i class="conum" data-value="1"></i><b>(1)</b>
+    &lt;context:component-scan base-package="cn.bgonline.wap.simpleapp.**.controller" use-default-filters="false"&gt;
+        &lt;context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/&gt;
+    &lt;/context:component-scan&gt;
+
+	<i class="conum" data-value="2"></i><b>(2)</b>
+    &lt;context:property-placeholder location="classpath*:/properties/application.routing.properties"/&gt;
+
+    &lt;mvc:interceptors &gt; <i class="conum" data-value="3"></i><b>(3)</b>
+        &lt;bean class="org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor"&gt;
+            &lt;property name="entityManagerFactory" ref="entityManagerFactory"/&gt;
+        &lt;/bean&gt;
+    &lt;/mvc:interceptors&gt;
+
+    &lt;import resource="classpath*:/askit-rest.xml"/&gt; <i class="conum" data-value="4"></i><b>(4)</b>
+
+&lt;/beans&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>配置controller扫描，注意路径</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>为Controller层的路由指定资源属性文件，可选，一般用于把请求路径外置</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>在视图层开启事务，解决在输出时报事务已关闭的异常</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>这里直接包含其它spring-mvc配置，其中有RESTFul的功能和一些其它全局配置，必须引入！</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="web-xml-配置"><a class="anchor" href="#web-xml-配置"></a>4. WEB.XML 配置</h2>
+<div class="sectionbody">
+<div class="exampleblock">
+<div class="title">WEB.XML一般配置</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;web-app metadata-complete="false"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0"&gt;
+    &lt;display-name&gt;simpleapp&lt;/display-name&gt;
+
+
+    &lt;context-param&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+        &lt;param-name&gt;spring.profiles.default&lt;/param-name&gt;
+        &lt;param-value&gt;developmentH2db,cache-ehCache,shiro-local&lt;/param-value&gt;
+    &lt;/context-param&gt;
+
+    &lt;context-param&gt; <i class="conum" data-value="2"></i><b>(2)</b>
+        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+        &lt;param-value&gt;
+            classpath*:/spring/**/applicationContext*.xml
+        &lt;/param-value&gt;
+    &lt;/context-param&gt;
+
+    &lt;context-param&gt; <i class="conum" data-value="3"></i><b>(3)</b>
+        &lt;param-name&gt;webAppRootKey&lt;/param-name&gt;
+        &lt;param-value&gt;simpleapp.root&lt;/param-value&gt;
+    &lt;/context-param&gt;
+
+    &lt;servlet&gt; <i class="conum" data-value="4"></i><b>(4)</b>
+        &lt;servlet-name&gt;springServlet&lt;/servlet-name&gt;
+        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;
+        &lt;init-param&gt;
+            &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+            &lt;param-value&gt;classpath*:/spring/dispatcher-main.xml&lt;/param-value&gt;
+        &lt;/init-param&gt;
+        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+    &lt;/servlet&gt;
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;springServlet&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;/&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+
+    &lt;servlet-mapping&gt; <i class="conum" data-value="5"></i><b>(5)</b>
+        &lt;servlet-name&gt;default&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;/ui/*&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;default&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;*.png&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;default&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;*.css&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;default&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;*.js&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;default&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;*.html&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+
+    &lt;filter&gt; <i class="conum" data-value="6"></i><b>(6)</b>
+        &lt;filter-name&gt;encodingFilter&lt;/filter-name&gt;
+        &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;/filter-class&gt;
+        &lt;init-param&gt;
+            &lt;param-name&gt;encoding&lt;/param-name&gt;
+            &lt;param-value&gt;UTF-8&lt;/param-value&gt;
+        &lt;/init-param&gt;
+        &lt;init-param&gt;
+            &lt;param-name&gt;forceEncoding&lt;/param-name&gt;
+            &lt;param-value&gt;true&lt;/param-value&gt;
+        &lt;/init-param&gt;
+    &lt;/filter&gt;
+    &lt;filter-mapping&gt;
+        &lt;filter-name&gt;encodingFilter&lt;/filter-name&gt;
+        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+    &lt;/filter-mapping&gt;
+
+    &lt;listener&gt; <i class="conum" data-value="7"></i><b>(7)</b>
+        &lt;listener-class&gt;org.springframework.web.util.WebAppRootListener&lt;/listener-class&gt;
+    &lt;/listener&gt;
+    &lt;listener&gt;
+        &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;
+    &lt;/listener&gt;
+
+
+
+    &lt;welcome-file-list&gt;
+        &lt;welcome-file&gt;index.html&lt;/welcome-file&gt;
+    &lt;/welcome-file-list&gt;
+    &lt;error-page&gt;
+        &lt;error-code&gt;500&lt;/error-code&gt;
+        &lt;location&gt;/500.html&lt;/location&gt;
+    &lt;/error-page&gt;
+    &lt;error-page&gt;
+        &lt;error-code&gt;404&lt;/error-code&gt;
+        &lt;location&gt;/404.html&lt;/location&gt;
+    &lt;/error-page&gt;
+
+&lt;/web-app&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>指定Spring运行环境</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>加载Spring配置文件，支持通配符</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>指定应用环境变量的KEY，应用启动后此变量的值为程序根目录，如在logback.xml中的引用： <code>${simpleapp.root}</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Spring MVC配置</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>静态资源使用默认servlet不走spring</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>指定页面编码</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Spring识别webAppRootKey的配置并添加环境变量</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="其它公共组件配置"><a class="anchor" href="#其它公共组件配置"></a>5. 其它公共组件配置</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="logback日志配置"><a class="anchor" href="#logback日志配置"></a>5.1. Logback日志配置</h3>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>官网参考： <a href="http://logback.qos.ch/" class="bare">http://logback.qos.ch/</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;configuration scan="true" scanPeriod="30 seconds" &gt; <i class="conum" data-value="1"></i><b>(1)</b>
+
+    &lt;property name="APP_LOG_PERFIX" value="logs/log"/&gt;  <i class="conum" data-value="2"></i><b>(2)</b>
+
+    &lt;jmxConfigurator/&gt; <i class="conum" data-value="3"></i><b>(3)</b>
+
+    &lt;appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender"&gt; <i class="conum" data-value="4"></i><b>(4)</b>
+        &lt;encoder&gt;
+            &lt;pattern&gt;%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n&lt;/pattern&gt;
+        &lt;/encoder&gt;
+    &lt;/appender&gt;
+
+    &lt;timestamp key="byday" datePattern="yyyyMMdd"/&gt;
+    &lt;appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender"&gt; <i class="conum" data-value="5"></i><b>(5)</b>
+        &lt;file&gt;${simpleapp.root}/${APP_LOG_PERFIX}-${byday}.log&lt;/file&gt;  <i class="conum" data-value="6"></i><b>(6)</b>
+        &lt;rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy"&gt;
+            &lt;fileNamePattern&gt;${simpleapp.root}/${APP_LOG_PERFIX}.%i.log-${byday}.zip&lt;/fileNamePattern&gt;
+            &lt;maxHistory&gt;90&lt;/maxHistory&gt;
+            &lt;minIndex&gt;1&lt;/minIndex&gt;
+            &lt;maxIndex&gt;10&lt;/maxIndex&gt;
+        &lt;/rollingPolicy&gt;
+        &lt;triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy"&gt;
+            &lt;maxFileSize&gt;5MB&lt;/maxFileSize&gt;
+        &lt;/triggeringPolicy&gt;
+        &lt;encoder&gt;
+            &lt;pattern&gt;%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n&lt;/pattern&gt;
+        &lt;/encoder&gt;
+    &lt;/appender&gt;
+
+
+    &lt;logger name="cn.bgonline.wap" level="TRACE"/&gt; <i class="conum" data-value="7"></i><b>(7)</b>
+    &lt;logger name="org.springframework" level="DEBUG"/&gt;
+
+    &lt;root level="INFO"&gt; <i class="conum" data-value="8"></i><b>(8)</b>
+        &lt;appender-ref ref="CONSOLE"/&gt;
+    &lt;/root&gt;
+
+
+    &lt;appender name="async" class="ch.qos.logback.classic.AsyncAppender"&gt; <i class="conum" data-value="9"></i><b>(9)</b>
+        &lt;!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 --&gt;
+        &lt;discardingThreshold&gt;0&lt;/discardingThreshold&gt;
+        &lt;!-- 更改默认的队列的条数,该值会影响性能.默认值为256 --&gt;
+        &lt;queueSize&gt;5000&lt;/queueSize&gt;
+        &lt;appender-ref ref="FILE"/&gt;
+    &lt;/appender&gt;
+    &lt;logger name="HTTP-LOG" level="TRACE" additivity="false"&gt; <i class="conum" data-value="10"></i><b>(10)</b>
+        &lt;appender-ref ref="async"/&gt;
+    &lt;/logger&gt;
+
+&lt;/configuration&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Logback配置，自动重新加载间隔30秒</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>日志路径前缀，相对路径</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>支持jmx在线调整和查看logback信息</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>控制台输出适配</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>文件输出适配，支持超过指定大小自动压缩</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td><code>${simpleapp.root}</code> 环境变量，本程序的根目录，参考 web.xml</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>根据日志名称指定日志记录级别或其它配置</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>根日志记录设置，包括级别和输出适配等</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>异步日志记录调用，解决大量日志记录阻塞的问题</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="10"></i><b>10</b></td>
+<td>使用异步日志记录配置，并取消对根配置的继承，如果不设置 <code>additivity="false"</code> 会同时使用根配置的日志输出适配</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="属性类型覆盖配置"><a class="anchor" href="#属性类型覆盖配置"></a>5.2. 属性类型覆盖配置</h3>
+
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="公用组件使用"><a class="anchor" href="#公用组件使用"></a>6. 公用组件使用</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="验证码"><a class="anchor" href="#验证码"></a>6.1. 验证码</h3>
+<div class="exampleblock">
+<div class="title">Spring配置集成</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;bean id="captcha" class="cn.bgonline.askit.module.base.captcha.spring.PatchcaFactoryBean"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>更多配置请参考 Spring配置</p>
+</div>
+</div>
+</div>
+<div class="exampleblock">
+<div class="title">Java Controller 代码</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Autowired
+ConfigurableCaptchaService cs; <i class="conum" data-value="1"></i><b>(1)</b>
+
+@RequestMapping("/pcrimg")  <i class="conum" data-value="2"></i><b>(2)</b>
+public void crimg(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	HttpSession session = request.getSession(true);
+	setResponseHeaders(response);
+	String token = EncoderHelper.getChallangeAndWriteImage(cs, "png", response.getOutputStream());
+	session.setAttribute("captchaToken", token);
+	System.out.println("当前的SessionID=" + session.getId() + "，验证码=" + token);
+}
+
+<i class="conum" data-value="3"></i><b>(3)</b>
+protected void setResponseHeaders(HttpServletResponse response) {
+	response.setContentType("image/png");
+	response.setHeader("Cache-Control", "no-cache, no-store");
+	response.setHeader("Pragma", "no-cache");
+	long time = System.currentTimeMillis();
+	response.setDateHeader("Last-Modified", time);
+	response.setDateHeader("Date", time);
+	response.setDateHeader("Expires", time);
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>注入验证码生成配置</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>验证码URL指定</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>设置输出头信息</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="系统监控使用及配置"><a class="anchor" href="#系统监控使用及配置"></a>6.2. 系统监控使用及配置</h3>
+<div class="sect3">
+<h4 id="pom引用"><a class="anchor" href="#pom引用"></a>6.2.1. POM引用</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;cn.bgonline.askit.modules&lt;/groupId&gt;
+    &lt;artifactId&gt;askit-monitor&lt;/artifactId&gt;
+    &lt;version&gt;${askit.version}&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="web-xml开启spring-profile"><a class="anchor" href="#web-xml开启spring-profile"></a>6.2.2. WEB.XML开启Spring profile</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;context-param&gt;
+    &lt;param-name&gt;spring.profiles.default&lt;/param-name&gt;
+    &lt;param-value&gt;monitor-datasource,monitor-http&lt;/param-value&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+&lt;/context-param&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>monitor-datasource</code> 数据源日志控制，有SQL查询和连接打开关闭的日志，<code>monitor-http</code> HTTP请求的日志记录</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="日志输出配置"><a class="anchor" href="#日志输出配置"></a>6.2.3. 日志输出配置</h4>
+<div class="exampleblock">
+<div class="title"><code>logback.xml</code> 配置监控日志输出</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">    &lt;property name="HTTP-LOG-TIMING" value="0" scope="CONTEXT"/&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+    &lt;property name="METHOD-LOG-TIMING" value="0" scope="CONTEXT"/&gt; <i class="conum" data-value="2"></i><b>(2)</b>
+
+    &lt;logger name="HTTP-LOG" level="TRACE" /&gt;  <i class="conum" data-value="3"></i><b>(3)</b>
+    &lt;logger name="DATASOURCE-LOG" level="TRACE" /&gt;  <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>HTTP-LOG-TIMING</code> HTTP日志记录的时间限制，超过多少毫秒的请求被记录。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>METHOD-LOG-TIMING</code> 数据查询的日志记录时间限制，超过多少毫秒的SQL执行语句被记录。</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>HTTP-LOG</code> HTTP日志记录的日志名称，可配置日志记录方式等</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><code>DATASOURCE-LOG</code> 数据源查询日志记录的日志名称，可配置日志记录方式等</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="数据缓存使用及配置"><a class="anchor" href="#数据缓存使用及配置"></a>6.3. 数据缓存使用及配置</h3>
+<div class="paragraph">
+<p><em>TODO</em></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="集合和字符处理使用实例指导"><a class="anchor" href="#集合和字符处理使用实例指导"></a>6.4. 集合和字符处理使用实例指导</h3>
+<div class="paragraph">
+<p><em>TODO</em></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="zookeeper使用及配置"><a class="anchor" href="#zookeeper使用及配置"></a>6.5. Zookeeper使用及配置</h3>
+<div class="sect3">
+<h4 id="配置"><a class="anchor" href="#配置"></a>6.5.1. 配置：</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>在web.xml中启用Spring profile： zookeeper</p>
+</li>
+<li>
+<p>通过Bean属性覆盖的方式设置链接字符串，如 <code>zookeeperFactory.connectionString = hadoopmaster:2181</code></p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="使用"><a class="anchor" href="#使用"></a>6.5.2. 使用：</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>注入 <code>@Autowired private CuratorFramework zkClient;</code></p>
+</li>
+<li>
+<p>`byteData = zkClient.getData().forPath(<em>/path</em>); SerializationUtils.deserialize(byteData); `</p>
+</li>
+<li>
+<p>参考： <a href="https://curator.apache.org/" class="bare">https://curator.apache.org/</a></p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="控制器使用"><a class="anchor" href="#控制器使用"></a>7. 控制器使用</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="pom引用-2"><a class="anchor" href="#pom引用-2"></a>7.1. POM引用</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;cn.bgonline.askit.modules&lt;/groupId&gt;
+    &lt;artifactId&gt;askit-rest&lt;/artifactId&gt;
+    &lt;version&gt;${askit.version}&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="基于entity操作的控制器用法及配置"><a class="anchor" href="#基于entity操作的控制器用法及配置"></a>7.2. 基于Entity操作的控制器用法及配置</h3>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Controller
+@RequestMapping("${demo}") <i class="conum" data-value="1"></i><b>(1)</b>
+public class DemoController extends BaseRestController&lt;DemoEntity, String&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+
+
+    private DemoRepository repo; <i class="conum" data-value="3"></i><b>(3)</b>
+
+    @Autowired
+    protected DemoController(DemoRepository repo) { <i class="conum" data-value="4"></i><b>(4)</b>
+        super(repo);
+        this.repo = repo;
+    }
+
+
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>请求的路径，通常把实际路径放在配置文件里通过变量引用</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>继承 <code>BaseRestController&lt;DemoEntity, String&gt;</code>  注意修改 <code>DemoEntity</code> 对应表的实体类名</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>当前控制器对应的持久化接口类</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>注入持久化接口处理类，并对类中持久类变量赋值</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="重写前置-后置方法"><a class="anchor" href="#重写前置-后置方法"></a>7.2.1. 重写前置、后置方法</h4>
+<div class="paragraph">
+<p><code>BaseRestController</code> 封装了基础的CRUD操作处理函数，但在某些情况需要对输入、输出的数据进行一些特殊处理，比如对输入的数据进行个别校验。对输出的数据进行一些过滤等。</p>
+</div>
+<div class="paragraph">
+<p>此时就可以通过前置和后置方法来做到以上需求。</p>
+</div>
+<div class="exampleblock">
+<div class="title">前置和后置方法</div>
+<div class="content">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">可用方法</dt>
+</dl>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">方法名称</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">功能</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">beforePage</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">在分页查询前调用</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">afterPage</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">在分页查询后调用</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">beforeDelete</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">在删除数据前调用</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">beforeBatchDelete</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">在批量删除数据前调用</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">afterDelete</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">在删除数据后调用</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">afterBatchDelete</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">在批量删除后调用</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">beforeSave</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">在数据保存前调用，包括创建和更新操作</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">afterSave</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">在数据保存后调用，包括创建和更新操作</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">beforeFindOne</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">在单条数据查询前调用</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">afterFindOne</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">在单条数据查询后调用</p></td>
+</tr>
+</tbody>
+</table>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">实例</dt>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">protected ResponseJsonEntity afterPage(ResponseJsonEntity responseJsonEntity) throws Exception {
+    return super.afterPage(responseJsonEntity.setExcludeFieldNames(new String[]{"group"})); <i class="conum" data-value="1"></i><b>(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>过滤数据输出</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="一般控制器用法及配置"><a class="anchor" href="#一般控制器用法及配置"></a>7.3. 一般控制器用法及配置</h3>
+<div class="paragraph">
+<p>一般控制器区别于基于Entity的控制器。<br>
+一般控制器不针对于任何Entity，而基于Entity的控制器主要是处理对于某Entity的CRUD处理。<br>
+当然也可以注入其它Entity的Repository处理其它Entity的存取操作，只是默认的CRUD只针对当前所指定的Entity。</p>
+</div>
+<div class="exampleblock">
+<div class="title">示例</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Controller
+@RequestMapping("path")
+public class DemoController extends BaseController { <i class="conum" data-value="1"></i><b>(1)</b>
+
+    // ...
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>继承于 BaseController 并非 BaseRestController</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="数据输出时指定过滤"><a class="anchor" href="#数据输出时指定过滤"></a>7.4. 数据输出时指定过滤</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">第一步</dt>
+<dd>
+<p>在Entity类上加注解：</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>@JsonFilter("exclude")</code> 表示可以做排除操作；</p>
+</li>
+<li>
+<p><code>@JsonFilter("include")</code> 表示可以做包含操作；</p>
+</li>
+</ol>
+</div>
+</dd>
+<dt class="hdlist1">第二步</dt>
+<dd>
+<p>在Controller输出方法里加过滤条件：</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>排除：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">protected ResponseJsonEntity afterPage(ResponseJsonEntity responseJsonEntity) throws Exception {
+    return super.afterPage(responseJsonEntity.setExcludeFieldNames(new String[]{"group"}));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>包含：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">protected ResponseJsonEntity afterPage(ResponseJsonEntity responseJsonEntity) throws Exception {
+    return super.afterPage(responseJsonEntity.setIncludeFieldNames(new String[]{"id","name"}));
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="基于spirng的数据接收"><a class="anchor" href="#基于spirng的数据接收"></a>7.5. 基于Spirng的数据接收</h3>
+<div class="paragraph">
+<p>接收数据包括通过GET查询的参数接收和POST等带有payload的数据接收。</p>
+</div>
+<div class="sect3">
+<h4 id="接收实例"><a class="anchor" href="#接收实例"></a>7.5.1. 接收实例</h4>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="title">内置查询数据接收封装</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public ResponseEntity&lt;ResponseJsonEntity&gt; listEntities(RestRequest restRequest) <i class="conum" data-value="1"></i><b>(1)</b>
+            throws Exception {
+
+            // ...
+
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">数据接收到Entity实体并校验</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public ResponseEntity&lt;ResponseJsonEntity&gt; createNewEntity(@Valid @RequestBody T entity)
+            throws Exception {
+
+            // ...
+
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">接收数据到List</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public ResponseEntity&lt;?&gt; deleteEntity(@RequestBody List&lt;String&gt; list)
+            throws Exception {
+
+            // ...
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>RestRequest 对REST请求数据提交的封装，包括分页、排序和查询等内容。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="官方参考"><a class="anchor" href="#官方参考"></a>7.5.2. 官方参考</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>@RequestBody<br>
+<a href="http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#mvc-ann-requestbody" class="bare">http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#mvc-ann-requestbody</a></p>
+</li>
+<li>
+<p>@Valid 数据校验<br>
+<a href="http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#validation-mvc" class="bare">http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#validation-mvc</a></p>
+</li>
+<li>
+<p>@RequestParam , @PathVariable 等用法<br>
+<a href="http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#portlet-annotation" class="bare">http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#portlet-annotation</a><br>
+<a href="http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#mvc-ann-requestmapping" class="bare">http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#mvc-ann-requestmapping</a></p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="jpa数据持久接口"><a class="anchor" href="#jpa数据持久接口"></a>8. JPA数据持久接口</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="pom引用-3"><a class="anchor" href="#pom引用-3"></a>8.1. POM引用</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;cn.bgonline.askit.modules&lt;/groupId&gt;
+    &lt;artifactId&gt;askit-jpa&lt;/artifactId&gt;
+    &lt;version&gt;${askit.version}&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="实体类entity写法"><a class="anchor" href="#实体类entity写法"></a>8.2. 实体类ENTITY写法</h3>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@Entity
+@Table(name = "DEMO")
+@DynamicUpdate <i class="conum" data-value="1"></i><b>(1)</b>
+@JsonFilter("exclude") <i class="conum" data-value="2"></i><b>(2)</b>
+@SuppressWarnings("serial")
+public class DemoEntity extends JpaBaseEntity{ <i class="conum" data-value="3"></i><b>(3)</b>
+
+    private String name;
+    private String text;
+    private Demo2Entity demoEntity; <i class="conum" data-value="4"></i><b>(4)</b>
+    private List&lt;Demo2Entity&gt; demoEntityList; <i class="conum" data-value="5"></i><b>(5)</b>
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    @OneToOne(cascade = CascadeType.ALL) <i class="conum" data-value="6"></i><b>(6)</b>
+    public Demo2Entity getDemoEntity() {
+        return demoEntity;
+    }
+
+    public void setDemoEntity(Demo2Entity demoEntity) {
+        this.demoEntity = demoEntity;
+    }
+
+    @ManyToMany(cascade = CascadeType.ALL) <i class="conum" data-value="7"></i><b>(7)</b>
+    public List&lt;Demo2Entity&gt; getDemoEntityList() {
+        return demoEntityList;
+    }
+
+    public void setDemoEntityList(List&lt;Demo2Entity&gt; demoEntityList) {
+        this.demoEntityList = demoEntityList;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>启用动态更新，Hibernate支持的动态更新，只生成变化字段的SQL更新语句</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>支持输出过滤，可以是 <code>@JsonFilter("exclude")</code> 或 <code>@JsonFilter("include")</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>继承自JpaBaseEntity，带有ID，createAt 等基本字段</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>一对一表关联，以Entity为后缀</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>多对多表关联，以EntityList为后缀</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>一对一关联关键字一般用法，cascade表示联动操作； 取消外键 <code>@ForeignKey(name = "none")</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>多对多关联关键字一般用法，cascade表示联动操作； 取消外键 <code>@ForeignKey(name = "none", inverseName = "none")</code></td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="持久接口repository的定义"><a class="anchor" href="#持久接口repository的定义"></a>8.3. 持久接口Repository的定义</h3>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public interface DemoRepository extends JpaExtRepository&lt;DemoEntity, String&gt; { <i class="conum" data-value="1"></i><b>(1)</b>
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>继续 <code>JpaExtRepository</code> 关指定相应的Entity约束，Spirng-data-jpa会自动创建其实现类并带有基本的CRUD操作函数。</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+关于Repository的Spring配置请参考<a href="#spring-jpa-配置">#spring-jpa-配置</a>的Spring JPA持久化相关配置第5部分。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="使用自定义查询语句"><a class="anchor" href="#使用自定义查询语句"></a>8.4. 使用自定义查询语句</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+  @Query("select u from User u where u.emailAddress = ?1")
+  User findByEmailAddress(String emailAddress);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>官方参考： <a href="http://docs.spring.io/spring-data/jpa/docs/1.6.4.RELEASE/reference/htmlsingle/#jpa.query-methods.at-query" class="bare">http://docs.spring.io/spring-data/jpa/docs/1.6.4.RELEASE/reference/htmlsingle/#jpa.query-methods.at-query</a></p>
+</div>
+<div class="sect3">
+<h4 id="查询中使用分页等功能"><a class="anchor" href="#查询中使用分页等功能"></a>8.4.1. 查询中使用分页等功能</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">Page&lt;User&gt; findByLastname(String lastname, Pageable pageable);
+List&lt;User&gt; findByLastname(String lastname, Sort sort);
+List&lt;User&gt; findByLastname(String lastname, Pageable pageable);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>Pageable</code> 带有这个参考后自动解析分页参数。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="在文件中使用查询语句"><a class="anchor" href="#在文件中使用查询语句"></a>8.4.2. 在文件中使用查询语句</h4>
+<div class="paragraph">
+<p><em>带添加，好像在文件中的语句会使用事务失效，是spring-data-jpa的bug，待在新版本中验证。</em></p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="使用spring-data-jpa查询语法"><a class="anchor" href="#使用spring-data-jpa查询语法"></a>8.5. 使用spring-data-jpa查询语法</h3>
+<div class="sect3">
+<h4 id="一般实例"><a class="anchor" href="#一般实例"></a>8.5.1. 一般实例</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">public interface UserRepository extends Repository&lt;User, Long&gt; {
+  List&lt;User&gt; findByEmailAddressAndLastname(String emailAddress, String lastname); <i class="conum" data-value="1"></i><b>(1)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>按Email、Address和Lastname查询</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="官方参考-2"><a class="anchor" href="#官方参考-2"></a>8.5.2. 官方参考</h4>
+<div class="paragraph">
+<p>官方语义查询参考：<br>
+<a href="http://docs.spring.io/spring-data/jpa/docs/1.6.4.RELEASE/reference/htmlsingle/#jpa.query-methods.query-creation" class="bare">http://docs.spring.io/spring-data/jpa/docs/1.6.4.RELEASE/reference/htmlsingle/#jpa.query-methods.query-creation</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="shiro权限配置"><a class="anchor" href="#shiro权限配置"></a>9. Shiro权限配置</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>权限模块基于apache-shiro开发，并完成了系统集群用户Session共享管理，可在线管理用户权限等功能。</p>
+</div>
+<div class="sect2">
+<h3 id="一般配置使用"><a class="anchor" href="#一般配置使用"></a>9.1. 一般配置使用</h3>
+<div class="sect3">
+<h4 id="pom引用-4"><a class="anchor" href="#pom引用-4"></a>9.1.1. POM引用</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;cn.bgonline.askit.modules&lt;/groupId&gt;
+    &lt;artifactId&gt;askit-shiro&lt;/artifactId&gt;
+    &lt;version&gt;${askit.version}&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="spring配置-2"><a class="anchor" href="#spring配置-2"></a>9.1.2. Spring配置</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;bean id="chainDefinitionSource" <i class="conum" data-value="1"></i><b>(1)</b>
+      class="cn.bgonline.wap.simpleapp.account.security.ChainDefinitionSource"&gt;
+    &lt;property name="filterChain"&gt;  <i class="conum" data-value="2"></i><b>(2)</b>
+        &lt;value&gt;
+            /logout = logout
+            /login.html = anon
+            /unauthorized.html = anon
+            /404.html = anon
+            /500.html = anon
+            /favicon.ico = anon
+            /** = authc
+        &lt;/value&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>id是固定写法，shiro启动会读取其默认配置</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>一些默认的shiro权限配置</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="权限接口配置"><a class="anchor" href="#权限接口配置"></a>9.1.3. 权限接口配置</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text" data-lang="text">jdbcAuthenticationRealm.authorizationRealm.bean_ref=xxx <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>基于属性覆盖的Bean属性赋值，值是一个Bean的引用。实现一个读取用户权限的接口。   <code>cn.bgonline.askit.module.base.shiro.realm.IAuthorizingRealm</code></td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="shiro权限配置说明"><a class="anchor" href="#shiro权限配置说明"></a>9.2. Shiro权限配置说明</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">rest</dt>
+<dd>
+<p>例子:  <code>/admins/user/**=rest[user]</code> ,根据请求的方法<br>
+相当于 <code>/admins/user/**=perms[user:method]</code> , 其中method为post，get，delete等。</p>
+</dd>
+<dt class="hdlist1">port</dt>
+<dd>
+<p>例子:  <code>/admins/user/**=port[8081]</code> <br>
+当请求的url的端口不是8081是跳转到 <code>schemal://serverName:8081?queryString</code> ,其中schmal是协议http或https等，serverName是你访问的host,8081是url配置里port的端口，queryString是你访问的url里的？后面的参数。</p>
+</dd>
+<dt class="hdlist1">perms</dt>
+<dd>
+<p>例子:  <code>/admins/user/**=perms[user:add:*]</code> ,perms参数可以写多个，多个时必须加上引号，并且参数之间用逗号分割，例如 <code>/admins/user/**=perms["user:add:*,user:modify:*"]</code> ，当有多个参数时必须每个参数都通过才通过，想当于isPermitedAll()方法。</p>
+</dd>
+<dt class="hdlist1">roles</dt>
+<dd>
+<p>例子:  <code>/admins/user/**=roles[admin]</code> ,参数可以写多个，多个时必须加上引号，并且参数之间用逗号分割，当有多个参数时，例如 <code>/admins/user/**=roles["admin,guest"]</code> ,每个参数通过才算通过，相当于hasAllRoles()方法。</p>
+</dd>
+<dt class="hdlist1">anon</dt>
+<dd>
+<p>例子:  <code>/admins/**=anon</code>  没有参数，表示可以匿名使用。</p>
+</dd>
+<dt class="hdlist1">authc</dt>
+<dd>
+<p>例如:  <code>/admins/user/**=authc</code> 表示需要认证才能使用，没有参数</p>
+</dd>
+<dt class="hdlist1">authcBasic</dt>
+<dd>
+<p>例如:  <code>/admins/user/**=authcBasic</code> 没有参数表示httpBasic认证</p>
+</dd>
+<dt class="hdlist1">ssl</dt>
+<dd>
+<p>例子:  <code>/admins/user/**=ssl</code> 没有参数，表示安全的url请求，协议为https</p>
+</dd>
+<dt class="hdlist1">user</dt>
+<dd>
+<p>例如:  <code>/admins/user/**=user</code> 没有参数表示必须存在用户，当登入操作时不做检查</p>
+</dd>
+</dl>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>这些过滤器分为两组，一组是认证过滤器，一组是授权过滤器。<br>
+其中anon，authcBasic，auchc，user是第一组，perms，roles，ssl，rest，port是第二组</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="相关参考"><a class="anchor" href="#相关参考"></a>9.3. 相关参考</h3>
+<div class="paragraph">
+<p>Shiro过滤器的定义： <a href="http://shiro.apache.org/web.html#Web-DefaultFilters" class="bare">http://shiro.apache.org/web.html#Web-DefaultFilters</a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="单元测试"><a class="anchor" href="#单元测试"></a>10. 单元测试</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>单元测试基于spring-test进行了封装，提供以下几种使用情况</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>SpringMVCTestNGCase 支持spring-mvc的测试</p>
+</li>
+<li>
+<p>SpringTestNGCase支持一般spring的测试，不支持mvc和事务</p>
+</li>
+<li>
+<p>SpringTransactionalTestNGCase，支持spirng事务的测试，默认会激活 test profile。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>测试类根据需要继承其中一个测试基类后并指定spring配置文件如：  <code>@ContextConfiguration(locations = {"/context-fragment-orm-jpa.xml"})</code>  即可。<br>
+测试框架基于testng，关于testng使用请参考：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="http://www.cnblogs.com/xguo/p/3300358.html" class="bare">http://www.cnblogs.com/xguo/p/3300358.html</a></p>
+</li>
+<li>
+<p><a href="http://testng.org/doc/documentation-main.html" class="bare">http://testng.org/doc/documentation-main.html</a></p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="pom引用-5"><a class="anchor" href="#pom引用-5"></a>10.1. POM引用</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;cn.bgonline.askit.modules&lt;/groupId&gt;
+    &lt;artifactId&gt;askit-test&lt;/artifactId&gt;
+    &lt;version&gt;${askit.version}&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="一般测试用法及配置"><a class="anchor" href="#一般测试用法及配置"></a>10.2. 一般测试用法及配置</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Spring 集成配置</dt>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;beans profile="test"&gt;
+    &lt;jdbc:embedded-database id="dataSource" type="H2"&gt;
+        &lt;!--导入初始数据--&gt;
+        &lt;jdbc:script encoding="utf-8" location="classpath:sql/sql-schema-*.sql"/&gt;
+        &lt;jdbc:script encoding="utf-8" location="classpath:sql/sql-data-*.sql"/&gt;
+    &lt;/jdbc:embedded-database&gt;
+&lt;/beans&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="spring-mvc控制器测试"><a class="anchor" href="#spring-mvc控制器测试"></a>10.3. Spring MVC控制器测试</h3>
+<div class="exampleblock">
+<div class="title">实例：</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">@ContextHierarchy({ <i class="conum" data-value="1"></i><b>(1)</b>
+        @ContextConfiguration(locations = {"/spring/applicationContext-orm-Jpa.xml", "/spring/applicationContext-test.xml"}),  <i class="conum" data-value="2"></i><b>(2)</b>
+        @ContextConfiguration(locations = {"/spring/dispatcher-account.xml"})  <i class="conum" data-value="3"></i><b>(3)</b>
+})
+
+public class UserControllerTest extends SpringMVCTestNGCase {  <i class="conum" data-value="4"></i><b>(4)</b>
+
+    @Override
+    public void init() {  <i class="conum" data-value="5"></i><b>(5)</b>
+        //buildMockMvc(); <i class="conum" data-value="6"></i><b>(6)</b>
+        this.mockMvc = MockMvcBuilders.standaloneSetup(xxxxxController).build(); <i class="conum" data-value="7"></i><b>(7)</b>
+    }
+
+    @Test
+    public void getTest() throws Exception { <i class="conum" data-value="8"></i><b>(8)</b>
+        mockMvc.perform(get("/account/user"))
+                .andExpect(jsonPath("metaData.totalElements").value(greaterThanOrEqualTo(1)));
+        ;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>加入spring配置</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>这里一般是spring配置</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>这里一般是spring-mvc配置</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>继承SpringMVCTestNGCase</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>这是必须的，要buildMockMvc</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>模拟所有controller类</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>模拟单个controller类，推荐，只模拟构建你要测试的类即可</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>开始一个测试</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="数据持久接口测试-基于事务"><a class="anchor" href="#数据持久接口测试-基于事务"></a>10.4. 数据持久接口测试，基于事务</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">//子类指定TransactionConfiguration
+@TransactionConfiguration(transactionManager = "transactionManager-main", defaultRollback = true)
+//子类指定applicationContext
+@ContextConfiguration(locations = {"/application-context.xml"})
+public class TestRepositoryTest extends SpringTransactionalTestNGCase{
+   //...
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jsonpath和matchers"><a class="anchor" href="#jsonpath和matchers"></a>10.5. JsonPath和Matchers</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">JsonPath</dt>
+<dd>
+<p>Spring单元测试依赖的json解析工具包，来自 <a href="http://goessner.net/articles/JsonPath/" class="bare">http://goessner.net/articles/JsonPath/</a></p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>用法：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">//读取结点metaData.totalElements的值
+.andExpect(jsonPath("metaData.totalElements").value(greaterThanOrEqualTo(1)));</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Matchers</dt>
+<dd>
+<p>这是一个用来数据比较的工具包，来自： <a href="http://hamcrest.org/JavaHamcrest/" class="bare">http://hamcrest.org/JavaHamcrest/</a></p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>用法：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">//表示大于等于
+.andExpect(jsonPath("metaData.totalElements").value(greaterThanOrEqualTo(1)));</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="test-profile"><a class="anchor" href="#test-profile"></a>10.6. TEST PROFILE</h3>
+<div class="paragraph">
+<p>默认会启用 <code>test profile</code> ，这样会启用内存数据库来做单元测试，在启动时会自动刷新数据结构和加载默认数据。<br>
+可以通过注解 <code>@ActiveProfiles(profiles = {”xx”,”xx”})</code> 添加其它profile，添加的profile会与父类的ActiveProfiles叠加</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="相关参考-2"><a class="anchor" href="#相关参考-2"></a>10.7. 相关参考</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>spring profile请参考： <a href="http://spring.io/blog/2011/02/14/spring-3-1-m1-introducing-profile/" class="bare">http://spring.io/blog/2011/02/14/spring-3-1-m1-introducing-profile/</a></p>
+</li>
+<li>
+<p>Matchers: <a href="http://hamcrest.org/JavaHamcrest/" class="bare">http://hamcrest.org/JavaHamcrest/</a></p>
+</li>
+<li>
+<p>Matchers: <a href="http://hamcrest.org/JavaHamcrest/javadoc/1.3/org/hamcrest/Matchers.html" class="bare">http://hamcrest.org/JavaHamcrest/javadoc/1.3/org/hamcrest/Matchers.html</a></p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="参考"><a class="anchor" href="#参考"></a>11. 参考</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>jdk7下载列表： <a href="https://jdk7.java.net/download.html" class="bare">https://jdk7.java.net/download.html</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2014-10-24 14:44:38 中国标准时间
+</div>
+</div>
+</body>
+</html>

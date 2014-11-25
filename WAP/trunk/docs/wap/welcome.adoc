@@ -1,0 +1,27 @@
+# 欢迎使用WAP开发平台
+
+[NOTE]
+====
+欢迎使用WAP开发平台，遇到问题请点击下面链接查看解决办法或提交新问题！  https://github.com/zlhl-dev/wap/issues
+====
+
+
+## WAP
+
+### 简单介绍
+#WAP# 是ASKIT、AUIKIT 组合后的最佳实践，制定了规范和开发模式从而形成了一个极具生产力的开发平台，
+
+实现了针对企业各类应用的从前到后到上线的完整解决方案；
+
+各组成部分均采用各业界主流技术选型，其设计目标是开发效率高、代码量少、使用简单、功能多样、容易扩展等！
+
+### WAP平台组成及基本原理
+
+```sequence
+Note left of AUIKIT: 前端UI框架AUIKIT
+Note right of ASKIT: 后台服务框架ASKIT
+AUIKIT->ASKIT: AJAX（基于REST协议）请求\n数据格式支持JSON和XML
+Note over ASKIT: 根据请求头进行CRUD操作并返回处理结果
+ASKIT-->>AUIKIT:数据返回数据报文
+AUIKIT-->>AUIKIT:UI渲染
+```

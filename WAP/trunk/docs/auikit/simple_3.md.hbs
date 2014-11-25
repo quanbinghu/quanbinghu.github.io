@@ -1,0 +1,32 @@
+### Service部分
+
+NOTE: Service部分源码,  请留意注释内容
+
+```js
+app.factory('DemoService', function ($http, RESTService) {
+    var demo = new RESTService('demo/');  #<1>
+
+    return {
+        demo: demo
+    };
+});
+```
+
+<1> `RESTService` 提供基础的Rest CRUD操作实现，做为系统基础功能实现，基本用法：
+
+```js
+//demoTable的Rest方法有：get/create/update/delete
+
+demoTable.get({
+    str: '查询字符串，解决params对像中存在同名变量的查询，如：?search=name-eq-1&search=text-eq-2', 
+    params: '查询参数对像', 
+    data: '提交的数据体对像，如表单数据'
+}, function (result) {
+
+    //...
+
+});
+```
+
+
+更多使用请参考 `Controller` 部分。

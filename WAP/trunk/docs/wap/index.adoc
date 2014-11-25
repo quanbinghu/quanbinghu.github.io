@@ -1,0 +1,36 @@
+# WAP开发平台 - 开发文档
+Aliencode <https://github.com/aliencode[@aliencode]>
+:description: WAP Document
+:keywords: WAP
+:doctype: book
+:compat-mode:
+:page-layout!:
+:toc: left
+:toclevels: 4
+:sectanchors:
+:sectlinks:
+:sectnums:
+:linkattrs:
+:icons: font
+:source-highlighter: highlight.js
+:experimental:
+:stem:
+:idprefix:
+:idseparator: -
+:ast: &ast;
+:dagger: pass:normal[^&dagger;^]
+:y: icon:check[role="green"]
+:n: icon:times[role="red"]
+:c: icon:file-text-o[role="blue"]
+:table-caption!:
+:example-caption!:
+:figure-caption!:
+:underscore: _
+
+include::welcome.adoc[]
+include::install_1.adoc[]
+include::install_2.adoc[]
+
+include::../askit/index.adoc[]
+
+include::../auikit/index.adoc[]

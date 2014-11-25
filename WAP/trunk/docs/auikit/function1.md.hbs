@@ -1,0 +1,58 @@
+## 创建项目
+
+[NOTE]
+====
+如何创建一个新的AUIKIT前端项目!
+
+先下载模板项目，删除模板项目中自带的演示内容，修改标题为你的项目名称即可，目录结构不变。
+====
+
+### 下载演示项目
+
+下载地址：
+https://github.com/zlhl-dev/auikit/releases
+
+选择最新版本下的 `auikit-template.zip` 进入下载，
+里面带有一个项目的基础模板、一些演示内容和auikit的相应发行版本文件。
+
+### 项目目录结构
+
+前端项目应遵循以下目录结构，包括目录名和文件名的命名规则等。
+
+```
+demo(项目名称目录)
+        |---assets（项目以外的资源引用）
+            |---auikit（auikit所有内容）
+                |---addon（引入第三方相对比较难以集成的组件）
+                |---css（auikit的样式文件和依赖组件的样式文件，已压缩）
+                    |---auikit.default.min.css
+                    |---auikit.dark.min.css
+                    |---auikit.pink.min.css
+                    |---libs.min.css
+                |---fonts（各种字样图标的字体文件）
+                |---js（auikit的js文件和依赖组件的js文件，已压缩）
+                    |---app.js（AngularJs的应用注册文件，可根据需要修改）
+                    |---auikit.min.js
+                    |---libs.min.js
+            |---imgs、js、css（其它引入静态资源，且以单独的目录存在）
+        |---app（项目所有相关文件，新项目删除此目录内容）
+            |---module1（模块名称）
+                |---views
+                    |---page1.html
+                    |---page2.html
+                |---controllers
+                    |---DemoCtrl.js
+                |---directives
+                    |---DemoDirective.js
+                |---filters
+                    |---DemoFilter.js
+                |---services
+                    |---DemoService.js
+            |---module2
+                |---...
+        |---index.html（新项目修改title和导航部分）
+        |---login.html
+        |---...
+```
+TIP: **新项目** 删除以上模板目录中 `app` 目录下的内容，并修改 `index.html` 中 `title` 和 `导航` 以形成自己的项目。
+

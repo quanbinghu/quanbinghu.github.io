@@ -1,0 +1,253 @@
+##  功能参考
+
+NOTE: AUIKIT封装后的常用功能使用参考！
+
+TIP: 下文使用  `viewPage`  来代表当前页面，通过 注入  `$element`  后  `var viewPage = $($element)`   来得到。
+
+### 消息提示
+不阻止用户操作
+
+自定义了默认的提示对话框，用法不变，如： `alert('hello')`
+
+### 对话框
+会阻止用户
+
+#### 提示对话框
+```js
+BootstrapDialog.alert('你好!');
+```
+或者
+```js
+BootstrapDialog.show({
+    title: '标题',
+    message: '你好!'
+});
+```
+
+#### 多按钮对话框，如确认和取消等
+```js
+BootstrapDialog.show({
+    title: '系统提示',
+    message: '确定删除吗？',
+    buttons: [
+    {
+        label: '确定删除',
+        cssClass: 'btn-primary',
+        action: function(d){
+            alert('删除成功!');
+			d.close();
+        }
+    }, {
+        label: '取消操作',
+        action: function(d){
+            d.close();
+        }
+    }]
+});
+```
+
+### 状态按钮
+按钮在点击后显示不同的状态，以表示操作正在进行中或已结束后的状态如成功或失败。
+
+#### 实例：
+
+##### 两个按钮：
+
+```html
+<button id="b1" type="button" class="btn-ani btn btn-primary" data-loading-type="zoom-out" data-success-text="操作成功 :)" data-error-text="操作失败 (:" data-loading-text="Loading..."   ng-click="save1($event)">
+    <span>提交后成功</span> <i class="ion-loading-b"></i>
+</button>
+
+<button class="btn btn-primary btn-ani"  data-loading-type="expand-right" data-success-text="操作成功 :)" data-error-text="操作失败 (:" data-loading-text="Loading..."   ng-click="save2($event)">
+    <span>提交后失败</span> <i class="ion-loading-b"></i>
+</button>
+```
+
+##### JS代码：
+
+```js
+//保存按钮事件
+$scope.save1 = function (e) {
+
+   if(viewPage.find('form').valid()){
+       //让按钮状态显示为加载中
+       $(e.delegateTarget).sbutton('loading');
+
+       //在ajax提交结束后，如果提交成功
+       $(e.delegateTarget).sbutton('success');
+
+       //在ajax提交结束后，如果提交失败
+       $(e.delegateTarget).sbutton('error');
+
+   };
+
+}
+```
+
+### 富文本编辑器
+指令：auikit-editor
+```html
+<textarea   name="content" cols="100" rows="8" auikit-editor ng-model="editor">123</textarea>
+```
+其中 `ng-model="editor"` ，表示在 `$scope` 中以变量名 `editor` 来代表编辑器，然后通过此变量名来操作此编辑器的属性值。变量名可自定义。
+
+读取编辑器的值：
+
+```js
+var editor = $scope.editor;
+alert(editor.html());
+```
+
+### 拖动元素
+
+指令：auikit-draggable
+
+```html
+<div class="modal-content" auikit-draggable data-handle=".modal-header">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+    </div>
+    <div class="modal-body ">
+        ...
+    </div>
+    <div class="modal-footer">
+        ...
+    </div>
+</div>
+```
+
+TIP: `data-handle=".modal-header"` 表示哪部分是可拖动区域。
+
+### 表格Table相关
+
+一般Table HTML，下面这段HTML包含了固定表头、多选和表头排序的功能
+
+```html
+<table class="table table-bordered  table-hover" auikit-table data-maxheight="200">
+	<thead>
+	<tr>
+		<th class="" width="20px">
+		    <!--表头多选框，固定格式-->
+			<label class="color-cr">
+				<input type="checkbox" class="event-checklist" title="全选/不选">
+				<span></span>
+			</label>
+		</th>
+		<!--表头排序，固定格式， data-field="name"：表示排序字段名-->
+		<th class="sorting event-sorting" width="200px" data-field="name">名称 <i class="sort fa fa-arrows-v"></i><i class="asc fa  fa-long-arrow-up"></i><i class="desc fa  fa-long-arrow-down"></i></th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr class="nganimate" ng-repeat="item in data">
+		<td class="center">
+		    <!--下面显示一个多选框，固定格式-->
+			<label class="color-cr">
+				<input type="checkbox" data-id="{{item.id}}">
+				<span></span>
+			</label>
+		</td>
+		<td class="">{{item.name}}</td>
+	</tr>
+	</tbody>
+</table>
+```
+
+一般Table数据加载JS，下面JS代码包含了分页、排序和查询功能：
+
+```js
+function load(number, sorting, search) {
+	var page = {limit: 5, page: number || 1};
+    //合并查询条件
+	demoTable.get(_.extend(page, sorting, search), function (result) {
+		$scope.data = result.data;
+        //显示分页
+		viewPage.find('.pagination').bootstrapPaginator(BPDefaultOptions(
+			{
+				currentPage: result.metaData.number + 1,
+				totalPages: result.metaData.totalPages,
+				onPageClicked: function (e, originalEvent, type, page) {
+					load(page, sorting);
+				}
+			}
+		));
+
+	});
+
+}
+```
+
+TIP: 为了显示的友好的加载效果一般用法：
+
+```js
+//延迟加载实现友好的加载效果
+setTimeout(function () {
+    load();
+}, 500);
+```
+
+#### 固定表头
+
+*  HTML：参考以上一般Table HTML
+* 指令：auikit-table
+* 属性：data-maxheight="300"  表示最大表格高度
+
+#### 表格多选功能
+
+* HTML：参考以上一般Table HTML
+
+##### 获取所有选择行的  IDS
+
+```js
+viewPage.find('table').getCheckedIds() # <1>
+```
+<1>  `table`  表格选择器，返回数组，如  `[1,2,3,4]`
+
+#### 表头排序
+HTML：参考以上一般Table HTML
+
+js排序事件：
+```js
+viewPage.find('table').on('sorting', function (e, obj) {
+        var sorting = {sort : obj.field};
+        sorting[obj.field + '.dir'] = obj.dir;
+        load(1, sorting);
+    });
+```
+
+#### 表格数据分页
+HTML：
+```html
+<div class="panel-footer">
+    <ul class="pagination"></ul>
+</div>
+```
+JS：参考上面一般JS代码中分页部分
+
+
+
+
+### Tooltip支持
+指令：auikit-tooltip
+
+显示Bootstrap的tooltip提示效果
+
+```html
+<a href="#" title="hello" auikit-tooltip> tooltip test </a>
+```
+
+#### 纯CSS3的Tooltip
+推荐使用
+
+```html
+<a href="javascript:void(0)" class="hint--bottom" data-hint="这里是提示信息"> xxxxx </a>
+```
+
+### 日期控件
+指令：auikit-datepicker
+
+一个日期控件选择器
+```html
+<input type="text" class="form-control " auikit-datepicker placeholder="Select a date">
+```
+

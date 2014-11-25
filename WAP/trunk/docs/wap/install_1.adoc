@@ -1,0 +1,52 @@
+## 环境要求
+
+NOTE:  运行环境要求和开发环境推荐
+
+### 构建工具
+**Maven3**
+
+* 下载地址： http://maven.apache.org/download.cgi
+* 配置环境变量
+** path：增加maven的bin目录，可以识别  `mvn` 命令
+** MAVEN_HOME：指定maven目录
+
+### Java运行环境
+**JDK1.7**
+
+* 下载地址： https://jdk7.java.net/download.html
+* 配置环境变量
+** path：增加jdk的bin目录，可以识别 `java` 命令
+** JAVA_HOME：指定java目录
+
+### 开发IDE推荐
+**IDEA13**
+
+* 下载地址： http://www.jetbrains.com/idea/download/
+
+
+### 浏览器推荐
+基于webkit的浏览器，`firefox`  或 `chrome`
+
+**chrome** 插件推荐
+
+|===
+|名称 |功能|地址
+
+|Advanced REST client
+|REST协议模拟工具
+|https://chrome.google.com/webstore/detail/hgmloofddffdnphfgcellkdfbfbjeloo[Advanced REST client @ *Google商店*]
+
+|HTML5 LocalStorage 管理器
+|LocalStorage管理器
+|http://andrelion.github.io/html5-localstorage-manager/[HTML5 LocalStorage 管理器 @ *Github*]
+
+|JSON-handle
+|JSON格式化查看
+|https://chrome.google.com/webstore/detail/iahnhfdhidomcpggpaimmmahffihkfnj[JSON-handle @ *Google商店*]
+
+|===
+
+### 文本编辑器
+**Notepad++**
+
+* 下载： http://notepad-plus-plus.org/

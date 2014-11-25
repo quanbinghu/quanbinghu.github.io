@@ -1,0 +1,428 @@
+## 服务发布后的接口使用规范
+
+在服务启动后对服务提供的接口使用方法进行说明
+
+### 基于REST服务的接口使用
+
+[NOTE]
+====
+对REST接口一般调用的使用方法说明，包括CRUD（增、删、改、查）操作。
+
+接口实例地址： http://localhost:8080/demo
+====
+
+.示例实体：
+```java
+@Entity
+@Table(name = "DEMO")
+@DynamicUpdate
+@JsonFilter("exclude")
+@SuppressWarnings("serial")
+public class DemoEntity extends JpaBaseEntity{
+
+    private String name;
+
+    private String text;
+
+    private Demo2Entity demoEntity;
+    private List<Demo2Entity> demoEntityList;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    @OneToOne(cascade = CascadeType.ALL)
+    public Demo2Entity getDemoEntity() {
+        return demoEntity;
+    }
+
+    public void setDemoEntity(Demo2Entity demoEntity) {
+        this.demoEntity = demoEntity;
+    }
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    public List<Demo2Entity> getDemoEntityList() {
+        return demoEntityList;
+    }
+
+    public void setDemoEntityList(List<Demo2Entity> demoEntityList) {
+        this.demoEntityList = demoEntityList;
+    }
+
+}
+
+```
+
+
+#### 查询数据，分页排序等
+请求方法： **GET**
+
+##### 一般查询
+对接口地址发出GET请求，根据要请求格式返回数据报文，如 demo.json 或 dmeo.xml 返回相应的 josn或xml 格式的数据结果报文。
+
+**查询语法： **
+
+`demo?search=id-eq-1&search=name-eq-hello`
+
+**查询条件：**
+
+|====
+|关键字|说明
+
+|eq
+|等于
+
+|like
+|模糊查询
+
+|llike
+|左模糊查询
+
+|rlike
+|右模糊查询
+
+|gt
+|大于
+
+|lt
+|小于
+
+|gte
+|大于等于
+
+|lte
+|小于等于
+|====
+
+TIP: 所有查询查询均会解析为 `与` 查询操作。
+
+
+[CAUTION]
+====
+[qanda]
+表关系一对一如何查询？::
+demo?search=demoEntity.id-eq-1&search=demoEntity.name-eq-hello
+
+表关系一对一多或多对一如何查询？::
+demo?search=demoEntityList.id-eq-1&search=demoEntityList.name-eq-hello  + 
+#注意：# `demoEntityList` 如果是一对多或多对多的变量名必须以List为后缀
+====
+
+
+##### 分页查询
+
+    demo?page=1&limit=10
+
+page:: 当前第几页
+limit:: 第页多少条
+
+##### 排序查询
+
+可对本类任意字段进行排序查询，包括关联类的字段。
+
+.本类字段排序
+    demo?sort=name&name.dir=asc
+    
+.一对一子类字段排序
+    demo?sort=demoEntity.name&demoEntity.name.dir=asc
+    
+.一对多或多对多子类字段排序
+    demo?sort=demoEntityList.name&demoEntityList.name.dir=asc
+
+
+#### 添加数据，POST
+
+语法路径： **/demo** +
+请求方法： **POST** +
+请求报文：
+```json
+{
+    name: "4",
+    text: "3",
+    demo2Entity: { 
+        id: "a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0"
+    },
+    demo3EntityList: [   
+        {
+            id: "a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0"
+        }
+    ]
+}
+```
+
+
+#### 修改数据，PUT
+
+语法路径： **/demo/a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0** +
+请求方法： **PUT** +
+请求报文：
+```json
+{
+    name: "4",
+    text: "3"
+}
+```
+
+
+
+#### 删除数据，DELETE
+
+删除数据包括单条和多条。
+
+##### 单条删除
+语法路径： **/demo/a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0** +
+请求方法： **DELETE** 
+
+##### 多条删除
+语法路径： **/demo** +
+请求方法： **DELETE** +
+请求报文：
+```json
+["a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0","a3ecbb24-b9fb-4dc2-aa91-2c538392cfe3"]
+```
+
+
+
+
+
+### 接口输入报文格式
+
+对接口提交数据的报文格式说明，一般分为JOSN和XML两种格式。
+
+.JOSN
+====
+```json
+{
+    name: "4",
+    text: "3",
+    demo2Entity: { #<1>
+        id: "a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0"
+    },
+    demo3EntityList: [   #<2>
+        {
+            id: "a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0"
+        }
+    ]
+}
+```
+
+<1> 一对一关联后数据提交，创建和更新操作
+<2> 多对多或一对多关联后数据提交，创建和更新操作
+
+**当提交的关联数据不存在时自动创建**，如：
+```json
+{
+    name: "4",
+    text: "3",
+    demo2Entity: {
+        name: "4"
+    }
+}
+```
+
+TIP: 必须设置关联关系包含创建，如： `@OneToOne(cascade = CascadeType.ALL)`
+
+====
+
+.xml
+====
+```xml
+<item>
+    <name>4</name>
+    <text>3</text>
+    <demoEntityList/>
+</item>
+```
+====
+
+
+### 接口输出报文格式
+
+请求接口后输出的报文格式说明，包括REST协议任意请求后的输出结果。
+
+#### 多条数据，如LIST
+
+
+.请求路径： http://localhost:8080/demo
+====
+```json
+{
+    success: true, #<1>
+    data: [  #<2>
+        {
+            id: "a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0",
+            createdAt: 1411631452616,
+            updatedAt: 1411631452616,
+            createdBy: "anonymous",
+            createdByUsername: "anonymous",
+            updatedBy: "anonymous",
+            updatedByUsername: "anonymous",
+            version: "",
+            name: "4",
+            text: "3",
+            demoEntity: "",
+            demoEntityList: [ ]
+        }
+    ],
+    includeFieldNames: [ ], #<3>
+    excludeFieldNames: [ ], #<4>
+    metaData: { #<5>
+        isLast: true, #<6>
+        numberOfElements: 18, #<7>
+        sort: "", #<8>
+        totalElements: 18, #<9>
+        number: 0, #<10>
+        isFirst: true, #<11>
+        totalPages: 1, #<12>
+        size: 20 #<13>
+    },
+    errorMessage: "", #<14>
+    errorCode: "" #<15>
+}
+```
+
+<1> 是否成功，true 成功， false 失败
+<2> 返回的数据体，如果 success: true 
+<3> 如果实体使用了包含策略这里显示包含了哪些字段
+<4> 如果实体使用了排除策略这里显示排除了哪些字段，一般会使用排除策略
+<5> 此报文的附加信息体
+<6> 是否最后一页数据
+<7> 当前页有多少条数据
+<8> 是否使用了排序，如果有排序则显示排序字段信息
+<9> 此接口一共有多少条数据
+<10> 当前第几页，从 0 开始
+<11> 是否为第一页
+<12> 一共有多少页数据
+<13> 每页多少条数据
+<14> 错误信息，如果 success: false 
+<15> 错误码，如果 success: false 
+
+====
+
+
+.请求路径： http://localhost:8080/demo.xml 
+====
+```xml
+<result xmlns="">
+    <success>true</success>
+    <includeFieldNames/>
+    <excludeFieldNames/>
+    <metaData>
+    <isLast>true</isLast>
+    <numberOfElements>18</numberOfElements>
+    <sort/>
+    <totalElements>18</totalElements>
+    <number>0</number>
+    <isFirst>true</isFirst>
+    <totalPages>1</totalPages>
+    <size>20</size>
+    </metaData>
+    <errorMessage/>
+    <errorCode/>
+    <data>
+        <item>
+            <id>9f30bfa0-a93a-4f12-9c13-748746b3cdbf</id>
+            <createdAt>1413350124200</createdAt>
+            <updatedAt>1413350124200</updatedAt>
+            <createdBy>anonymous</createdBy>
+            <createdByUsername>anonymous</createdByUsername>
+            <updatedBy>anonymous</updatedBy>
+            <updatedByUsername>anonymous</updatedByUsername>
+            <version/>
+            <name>123</name>
+        </item>
+    </data>
+</result>
+```
+
+NOTE: 说明参考第一部分JSON段
+
+====
+
+
+#### 单条数据，如一个对像或MAP等
+
+
+.请求路径：  http://localhost:8080/demo/a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0
+====
+```json
+{
+    success: true,
+    data: {
+        id: "a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0",
+        createdAt: 1411631452616,
+        updatedAt: 1411631452616,
+        createdBy: "anonymous",
+        createdByUsername: "anonymous",
+        updatedBy: "anonymous",
+        updatedByUsername: "anonymous",
+        version: "",
+        name: "4",
+        text: "3",
+        demoEntity: "",
+        demoEntityList: [ ]
+    },
+    includeFieldNames: [ ],
+    excludeFieldNames: [ ],
+    metaData: {
+    totalElements: 0
+    },
+    errorMessage: "",
+    errorCode: ""
+}
+```
+
+
+NOTE: 说明参考第一部分JSON段
+
+====
+
+.请求路径：  http://localhost:8080/demo/a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0.xml
+====
+```xml
+<result xmlns="">
+    <success>true</success>
+    <includeFieldNames/>
+    <excludeFieldNames/>
+    <metaData>
+        <totalElements>0</totalElements>
+    </metaData>
+    <errorMessage/>
+    <errorCode/>
+    <data>
+    <item>
+        <id>a3ecbb24-b9fb-4dc2-aa91-2c538392cfe0</id>
+        <createdAt>1411631452616</createdAt>
+        <updatedAt>1411631452616</updatedAt>
+        <createdBy>anonymous</createdBy>
+        <createdByUsername>anonymous</createdByUsername>
+        <updatedBy>anonymous</updatedBy>
+        <updatedByUsername>anonymous</updatedByUsername>
+        <version/>
+        <name>4</name>
+        <text>3</text>
+        <demoEntity/>
+        <demoEntityList/>
+    </item>
+    </data>
+</result>
+```
+
+NOTE: 说明参考第一部分JSON段
+
+====
+
+
+

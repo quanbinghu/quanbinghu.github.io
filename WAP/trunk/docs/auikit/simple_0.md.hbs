@@ -1,0 +1,26 @@
+## 完整的CRUD实例
+
+[NOTE]
+====
+需求，实现基于的CRUD和排序等功能
+
+后台接口： http://localhsot:8080/demo
+====
+
+
+### 一般需要三部分组成，即：视图、控制、服务
+
+- [*]  视图（view）主要由HTML组成，实现界面元素的展示，demo.html
+- [*]  控制（Controller）基于AngularJs，实现界面元素和业务流程的控制，DemoController.js
+- [*]  服务（Service）基于AngularJs，复杂业务逻辑的封装和与后台数据交互的实现，DemoService.js
+
+
+### 交互原理
+```sequence
+view->ctrl:视图控制，事件触发
+ctrl->service:调用数据请求
+service->API:业务处理，发出AJAX请求
+API-->>API:后台JAVA服务，处理请求
+API-->>ctrl:返回
+ctrl-->>view:渲染
+```

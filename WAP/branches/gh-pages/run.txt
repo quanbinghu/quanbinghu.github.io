@@ -1,0 +1,10 @@
+
+rem 以管理员权限运行CMD，定位到当前目录运行以下命令
+
+@echo off
+
+echo http://localhost:90/
+call ruby -run -e httpd . -p 90
+
+
+pause

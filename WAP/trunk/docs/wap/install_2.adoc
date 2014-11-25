@@ -1,0 +1,36 @@
+
+## 安装项目原型
+
+NOTE:  如何快速利用WAP开发平台创建项目！
+
+### 下载Maven项目模板
+下载地址： https://github.com/zlhl-dev/wap/releases  ，选择相应的版本进行下载
+
+### 安装Maven项目模板
+解压后进入模板目录，运行 `install.bat`
+
+### 创建新项目
+
+#### 通过archetype-generate.bat创建项目
+
+解压后进入模板目录，拷贝 `archetype-generate.bat` 文件到你新项目的目录运行，
+按照提示选择 `wap-archetype` 前面的编号如： kbd:[1]，输入 `groupId如com.zlhl` 、 `artifactId如demoapp` 和版号即可。
+
+#### 通过命令的方式创建
+
+在CMD命令窗口输入命令：  `mvn archetype:generate -DarchetypeCatalog=local`
+
+会出现如下内容：
+
+```cmd
+Choose archetype:
+1: local -> cn.bgonline.wap:wap-archetype (wap-archetype)
+Choose a number or apply filter (format: [groupId:]artifactId, case sensitive contains): :
+```
+
+按照提示选择 `wap-archetype` 前面的编号如： kbd:[1] ，输入 `groupId如com.zlhl` 、 `artifactId如demoapp` 和版号即可。
+
+#### 导入项目
+通过IDEA编辑器导入Maven项目
+
+步骤： kbd:[File] -> kbd:[Import Project]  选择项目目录里的  `pom.xml`  一直下一步即可。

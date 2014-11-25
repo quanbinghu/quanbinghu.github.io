@@ -1,0 +1,265 @@
+## Spring配置
+
+### 通用配置
+
+一些公共组件的配置
+
+
+#### 配置验证码
+
+```xml
+<bean id="captcha" class="cn.bgonline.askit.module.base.captcha.spring.PatchcaFactoryBean"/>
+```
+
+.可配置参数：
+|====
+|参数名|默认值|功能
+|width|100|图片宽度
+|height|28|图片高度
+|maxLength|6|验证码字符最多个数
+|minLength|3|验证码字符最少个数
+|maxFontsize|18|字符最大字体
+|minFontsize|14|字符最小字体
+|margin|5|字符边距
+|characters|23456789ABCDEFGHGKLMNPQRSTUVWXY|验证码字符范围
+|====
+
+
+
+
+### Spring 通用配置
+
+.Spring一般配置
+====
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		 
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd"
+        >
+
+    <description>SPRING公共配置</description>
+
+    <context:component-scan base-package="cn.bgonline.wap.simpleapp"> #<1>
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+ 
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">  #<2>
+        <property name="basenames">
+            <list>
+                <value>lang.applicationresource</value>
+                <value>lang.ValidationMessages</value>
+            </list>
+        </property>
+    </bean>
+ 
+    <bean id="applicationContextUtils" class="cn.bgonline.askit.module.base.spring.ApplicationContextUtils" />  #<3>
+ 
+    <bean name="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">  #<4>
+        <property name="validationMessageSource" ref="messageSource"/>
+    </bean>
+
+ 
+    <bean class="cn.bgonline.askit.module.base.spring.config.BeanRefPropertyOverrideConfigurer">  #<5>
+        <property name="location" value="classpath:/properties/property-override.properties"/>
+        <property name="ignoreInvalidKeys" value="true"/>
+    </bean>
+
+
+
+    <!-- production环境 -->
+    <beans profile="production">  #<6>
+        <context:property-placeholder ignore-unresolvable="true" order="0"
+                                      location="classpath*:/properties/application.properties"/>
+ 
+        <bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
+              destroy-method="close"> #<7>
+            <property name="url" value="${jdbc.url}"/>
+            <property name="username" value="${jdbc.username}"/>
+            <property name="password" value="${jdbc.password}"/>
+            <property name="filters" value="stat"/>
+            <property name="maxActive" value="20"/>
+            <property name="initialSize" value="1"/>
+            <property name="maxWait" value="60000"/>
+            <property name="minIdle" value="1"/>
+            <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+            <property name="minEvictableIdleTimeMillis" value="300000"/>
+            <!--
+            用来检测连接是否有效的sql-->
+            <property name="validationQuery">
+                <value>SELECT 'x'</value>
+            </property>
+
+            <property name="testWhileIdle" value="true"/>
+            <property name="testOnBorrow" value="false"/>
+            <property name="testOnReturn" value="false"/>
+            <property name="poolPreparedStatements" value="true"/>
+            <property name="maxOpenPreparedStatements" value="20"/>
+        </bean>
+
+    </beans>
+
+    <!-- local development h2 数据库环境 -->
+    <beans profile="developmentH2db">  #<8>
+        <context:property-placeholder ignore-resource-not-found="true" order="0"
+                                      location="classpath*:/properties/application.properties,
+          			  classpath*:/properties/application.development.properties" ignore-unresolvable="true"/>
+        <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+            <property name="driverClass" value="${jdbc.driver}"/>
+            <property name="url" value="${jdbc.url}"/>
+            <property name="username" value="${jdbc.username}"/>
+            <property name="password" value="${jdbc.password}"/>
+        </bean>
+    </beans>
+ 
+    <beans profile="test">  #<9>
+        <context:property-placeholder ignore-resource-not-found="true" order="0"
+                                      location="classpath*:/properties/application.properties,
+          			  classpath*:/properties/application.test.properties"/>
+
+        <!-- 嵌入式内存中数据库 -->
+        <jdbc:embedded-database id="dataSource" type="H2">
+            <!--数据结构同运行环境一至-->
+            <!--<jdbc:script location="classpath:sql/h2/schema.sql"/>-->
+            <!--导入测试数据，与运行环境不同，设置编码utf-8-->
+            <!--<jdbc:script location="classpath:data/import-data.sql" encoding="utf-8"/>-->
+        </jdbc:embedded-database>
+
+    </beans>
+
+
+</beans>
+```
+
+<1> 注册bean, Controller除外由mvc部分注册
+<2> 多语言资源文件，应对文件：`lang/applicationresource_zh_CN.properties` , `lang/ValidationMessages_zh_CN.properties` 
+<3> ApplicationContext工具 ,例： ApplicationContextUtils.getBean("beanid")
+<4> JSR303 Validator定义， 支持Spring @Valid
+<5> Spring 配置中某些bean没有使用占位符，通过bean的id和属性名重新赋值，如：xxx.xxx=xxx，如果是Bean引用：xxx.xxx.bean_ref=xxx
+<6> Spring运行环境配置，在 `web.xml` 中指定，请参考 `web.xml` 相关配置。
+<7> alibaba.druid连接池配置, 更多参考： https://github.com/alibaba/druid/wiki/DruidDataSource%E9%85%8D%E7%BD%AE%E5%B1%9E%E6%80%A7%E5%88%97%E8%A1%A8[DruidDataSource配置属性列表]
+
+<8> 本地开发环境配置，一般使用嵌入式数据库，不使用链接池
+<9> test环境，使用嵌入式内存中数据库
+
+====
+
+
+
+### Spring JPA 配置
+
+.Spring Data 官方参考
+====
+. http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#orm
+. http://docs.spring.io/spring-data/data-commons/docs/1.8.4.RELEASE/reference/htmlsingle/
+. http://docs.spring.io/spring-data/jpa/docs/1.6.4.RELEASE/reference/htmlsingle/
+====
+
+.Spring JPA持久化相关配置
+====
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd"
+       >
+
+    <util:properties id="jpaProperties"/> #<1>
+
+    <bean id="jpaVendorAdaptor" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"> #<2>
+        <!--关闭Sql显示，调试时使用log4jdbc-->
+        <property name="showSql" value="false"/>
+        <!--自动建表功能，可通过构建工具实现-->
+        <property name="generateDdl" value="true"/>
+        <!--<property name="database" value="HSQL"/>-->
+    </bean>
+
+    <bean id="entityManagerFactory"  class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"> #<3>
+         <property name="dataSource" ref="dataSource"/>
+         <property name="jpaVendorAdapter" ref="jpaVendorAdaptor"/>
+         <property name="packagesToScan" value="cn.bgonline.wap.simpleapp.**.entity"/>
+         <property name="jpaProperties" ref="jpaProperties"/>
+        <!--<property name="mappingResources" value="META-INF/sqlmapping.xml"/>-->  #<4>
+    </bean>
+    <jpa:repositories #<5>
+            repository-impl-postfix="Impl"
+            base-package="cn.bgonline.wap.simpleapp.**.repository"
+            transaction-manager-ref="transactionManager"
+            entity-manager-factory-ref="entityManagerFactory"
+            factory-class="cn.bgonline.askit.module.jpa.ExtJpaRepositoryFactoryBean"
+            />
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
+
+
+    <bean id="userAuditorAware" class="cn.bgonline.wap.simpleapp.account.common.UserAuditorAware" /> #<6>
+    <jpa:auditing auditor-aware-ref="userAuditorAware" />
+ 
+    <tx:annotation-driven /> #<7>
+
+</beans>
+```
+
+<1> JPA属性配置，不指定此属性generateDdl不生效
+<2> JPA实现，参数VendorAdapter，这里使用了HIBERNATE
+<3> Spring-data-JPA实体管理者
+<4> 将JPQL查询语句放到一个配置文件中
+<5> JPA持久接口配置
+<6> 自动赋值为 @CreatedBy, @LastModifiedBy @CreatedDate and @LastModifiedDate
+<7> 在应用层注解事务支持，注意指定事务名称：@Transactional("transactionManager-xxx") 
+====
+
+
+
+### Spring MVC 配置
+
+.Spring mvc 一般配置
+====
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd"
+       >
+ 
+	#<1>
+    <context:component-scan base-package="cn.bgonline.wap.simpleapp.**.controller" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+ 
+	#<2>
+    <context:property-placeholder location="classpath*:/properties/application.routing.properties"/>
+
+    <mvc:interceptors > #<3>
+        <bean class="org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor">
+            <property name="entityManagerFactory" ref="entityManagerFactory"/>
+        </bean>
+    </mvc:interceptors>
+ 
+    <import resource="classpath*:/askit-rest.xml"/> #<4>
+
+</beans>
+```
+
+<1> 配置controller扫描，注意路径 
+<2> 为Controller层的路由指定资源属性文件，可选，一般用于把请求路径外置
+<3> 在视图层开启事务，解决在输出时报事务已关闭的异常
+<4> 这里直接包含其它spring-mvc配置，其中有RESTFul的功能和一些其它全局配置，必须引入！
+
+
+====
+ 

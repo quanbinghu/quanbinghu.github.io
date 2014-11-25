@@ -1,0 +1,174 @@
+## 控制器使用
+
+### POM引用
+
+```xml
+<dependency>
+    <groupId>cn.bgonline.askit.modules</groupId>
+    <artifactId>askit-rest</artifactId>
+    <version>${askit.version}</version>
+</dependency>
+```
+
+### 基于Entity操作的控制器用法及配置
+
+====
+```java
+@Controller
+@RequestMapping("${demo}") #<1>
+public class DemoController extends BaseRestController<DemoEntity, String> { #<2>
+
+
+    private DemoRepository repo; #<3>
+
+    @Autowired
+    protected DemoController(DemoRepository repo) { #<4>
+        super(repo);
+        this.repo = repo;
+    }
+
+
+
+}
+```
+
+
+<1> 请求的路径，通常把实际路径放在配置文件里通过变量引用
+<2> 继承 `BaseRestController<DemoEntity, String>`  注意修改 `DemoEntity` 对应表的实体类名
+<3> 当前控制器对应的持久化接口类
+<4> 注入持久化接口处理类，并对类中持久类变量赋值
+
+====
+
+
+#### 重写前置、后置方法
+
+`BaseRestController` 封装了基础的CRUD操作处理函数，但在某些情况需要对输入、输出的数据进行一些特殊处理，比如对输入的数据进行个别校验。对输出的数据进行一些过滤等。 
+
+此时就可以通过前置和后置方法来做到以上需求。
+
+.前置和后置方法
+====
+
+可用方法:: 
+|====
+|方法名称|功能
+|beforePage|在分页查询前调用
+|afterPage|在分页查询后调用
+|beforeDelete|在删除数据前调用
+|beforeBatchDelete|在批量删除数据前调用
+|afterDelete|在删除数据后调用
+|afterBatchDelete|在批量删除后调用
+|beforeSave|在数据保存前调用，包括创建和更新操作
+|afterSave|在数据保存后调用，包括创建和更新操作
+|beforeFindOne|在单条数据查询前调用
+|afterFindOne|在单条数据查询后调用
+|====
+
+实例::
+```java
+protected ResponseJsonEntity afterPage(ResponseJsonEntity responseJsonEntity) throws Exception {
+    return super.afterPage(responseJsonEntity.setExcludeFieldNames(new String[]{"group"})); #<1>
+}
+```
+
+<1> 过滤数据输出
+
+====
+
+
+### 一般控制器用法及配置
+
+一般控制器区别于基于Entity的控制器。 +
+一般控制器不针对于任何Entity，而基于Entity的控制器主要是处理对于某Entity的CRUD处理。 +
+当然也可以注入其它Entity的Repository处理其它Entity的存取操作，只是默认的CRUD只针对当前所指定的Entity。
+
+.示例
+====
+```java
+@Controller
+@RequestMapping("path") 
+public class DemoController extends BaseController { #<1>
+
+    // ...
+
+}
+```
+<1> 继承于 BaseController 并非 BaseRestController
+====
+
+
+### 数据输出时指定过滤
+
+第一步::
+在Entity类上加注解：
+. `@JsonFilter("exclude")` 表示可以做排除操作；
+. `@JsonFilter("include")` 表示可以做包含操作；
+
+第二步::
+在Controller输出方法里加过滤条件：
+
+排除：
+```java
+protected ResponseJsonEntity afterPage(ResponseJsonEntity responseJsonEntity) throws Exception {
+    return super.afterPage(responseJsonEntity.setExcludeFieldNames(new String[]{"group"})); 
+}
+```
+
+包含：
+```java
+protected ResponseJsonEntity afterPage(ResponseJsonEntity responseJsonEntity) throws Exception {
+    return super.afterPage(responseJsonEntity.setIncludeFieldNames(new String[]{"id","name"})); 
+}
+```
+
+
+### 基于Spirng的数据接收
+
+接收数据包括通过GET查询的参数接收和POST等带有payload的数据接收。
+
+#### 接收实例
+====
+
+.内置查询数据接收封装
+```java
+public ResponseEntity<ResponseJsonEntity> listEntities(RestRequest restRequest) #<1>
+            throws Exception {
+            
+            // ...
+            
+}
+```
+
+.数据接收到Entity实体并校验
+```java
+public ResponseEntity<ResponseJsonEntity> createNewEntity(@Valid @RequestBody T entity)
+            throws Exception {
+            
+            // ...
+            
+}
+```
+
+.接收数据到List
+```java
+public ResponseEntity<?> deleteEntity(@RequestBody List<String> list)
+            throws Exception {
+            
+            // ...
+            
+}
+```
+
+<1> RestRequest 对REST请求数据提交的封装，包括分页、排序和查询等内容。
+====
+
+#### 官方参考
+
+. @RequestBody +
+http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#mvc-ann-requestbody
+. @Valid 数据校验 +
+http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#validation-mvc
+. @RequestParam , @PathVariable 等用法 +
+http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#portlet-annotation +
+http://docs.spring.io/spring/docs/3.2.11.RELEASE/spring-framework-reference/htmlsingle/#mvc-ann-requestmapping

@@ -1,0 +1,110 @@
+# AUIKIT前端UI开发包
+Aliencode <https://github.com/aliencode[@aliencode]>
+:description: WAP Document
+:keywords: WAP
+:doctype: book
+:compat-mode:
+:page-layout!:
+:toc: left
+:toclevels: 4
+:sectanchors:
+:sectlinks:
+:sectnums:
+:linkattrs:
+:icons: font
+:source-highlighter: highlight.js
+:experimental:
+:stem:
+:idprefix:
+:idseparator: -
+:ast: &ast;
+:dagger: pass:normal[^&dagger;^]
+:y: icon:check[role="green"]
+:n: icon:times[role="red"]
+:c: icon:file-text-o[role="blue"]
+:table-caption!:
+:example-caption!:
+:figure-caption!:
+:underscore: _
+
+
+NOTE:  欢迎使用AUIKIT前端开发工具包，遇到问题请点击下面链接查看解决办法或提交新问题！  https://github.com/zlhl-dev/auikit/issues
+
+**auikit** (Adminstrator UI Kit)，基于优秀开源组件的完美结合，并进行了适量的兼容整合开发从而形成的一个功能强大、完整的前端开发工具包。
+
+目标是解决管理者类型前端项目的复杂需求和优秀的用户体验。源于框架高于框架！
+
+## 技术特点
+* 多种风格支持
+* 支持LESS和目前主流前端开发工具，方便二次开发和持续维护
+* 对WEBKIT内核浏览器支持良好，不支持IE9以下浏览器
+* 良好的编码风格,开发规范和先进的开发模式以支持各种规模的项目
+* 对HTML和CSS的规范来自 Bootstrap 思想
+* 对JS和整体项目结构的规范来自 AngularJs 的思想和约定
+* 一切以开发效率和用户体验为最高设计要求
+
+
+## 技术选型
+### 核心框架：
+
+* 以**Bootstrap**为展示基础，基于HTML5和CSS3，支持webkit内核的浏览器。做了大量自定义开发和调整，使其更适用于管理者UI和特有风格。
+开发者应遵循Bootstrap代码规范和HTML元素结构约定。
+* 以**AngularJs**做为前端MVC框架，和展现控制，jQuery做为补充使用。原则：不完全依赖谁，只在合适的位置选最好用的。
+
+### 周边扩展：
+集成了大量管理者UI所常用到的界面组件，如：消息提示、编辑器、树型菜单、对话框等。均来自开源社区。
+对这些组件做了集成、整合的开发，部分组件封装为AngularJs组件可直接调用。
+并对部分组件的样式进行了调整以适合整体的风格。
+
+## 开发环境
+
+|===
+|功能|软件|介绍|主页
+
+|环境要求
+|Node.js
+|轻量便捷的JS开发环境
+|http://nodejs.org/
+
+|环境要求
+|Npm
+|Nodejs包管理
+|https://www.npmjs.org/
+
+|代码编辑
+|Idea
+|很好的支持前端语言的开发
+|http://www.jetbrains.com/idea
+
+|依赖管理
+|Bower
+|功能类似Maven，可以方便引入依赖组件无需自行下载
+|http://bower.io/
+
+|编译构建
+|Grunt
+|构建工具，如CSS、JS的编译、各种预处理和发行处理等功能
+|http://gruntjs.com/
+
+|===
+
+
+
+include::function1.md.hbs[]
+include::function.md.hbs[]
+
+
+include::simple_0.md.hbs[]
+include::simple_1.md.hbs[]
+include::simple_2.md.hbs[]
+include::simple_3.md.hbs[]
+
+include::styleguide_css.md.hbs[]
+include::styleguide_js.md.hbs[]
+
+include::function2.md.hbs[]
+
+
+
+include::other.md.hbs[]
+

@@ -1,0 +1,120 @@
+# ASKIT后台服务开发包
+Aliencode <https://github.com/aliencode[@aliencode]>
+:description: WAP Document
+:keywords: WAP
+:doctype: book
+:compat-mode:
+:page-layout!:
+:toc: left
+:toclevels: 4
+:sectanchors:
+:sectlinks:
+:sectnums:
+:linkattrs:
+:icons: font
+:source-highlighter: highlight.js
+:experimental:
+:stem:
+:idprefix:
+:idseparator: -
+:ast: &ast;
+:dagger: pass:normal[^&dagger;^]
+:y: icon:check[role="green"]
+:n: icon:times[role="red"]
+:c: icon:file-text-o[role="blue"]
+:table-caption!:
+:example-caption!:
+:figure-caption!:
+:underscore: _
+
+
+NOTE:  欢迎使用ASKIT，遇到问题请点击下面链接查看解决办法或提交新问题！  https://github.com/zlhl-dev/askit/issues
+
+**ASKIT** (Application Service Kit)
+支持开发基于RESTFul协议服务接口的开发套件 ！
+
+ASKIT后端应用服务框架，基于JavaEE界主流技术框架的封装和再开发而提供了更为简洁的使用方法和更加强大的基础功能。
+
+运行环境需要支持JDK7和Servlet3，构建工具采用Maven！
+
+
+//服务接口用法
+include::use.hbs[]
+
+
+
+
+
+## 组件选型和一般规范
+//一般目录结构
+include::tree.hbs[]
+### 组件组成架构图
+image::imgs/askit/askit.png[]
+### 组件协作图
+```sequence
+request->servlet:请求（doFilter）
+servlet->monitor:日志记录
+note over monitor:内存记录HTTP请求相关信息
+servlet->rest:
+rest->rest:CRUD请求处理
+rest->server:业务逻辑处理
+rest-->>jpa:直接走jpa数据操作
+server->jpa:数据处理
+jpa->jpa:执行数据存取操作
+jpa-->>rest:数据处理结果
+rest-->>monitor:response
+monitor->monitor:日志存储
+rest-->>servlet:response
+servlet-->>request:response
+```
+### 各组件技术选型
+
+#### 项目本身提供可用组件
+|====
+|组件|功能|依赖组件|说明
+|askit-base|基础组件|SpringFramework|系统基础组件，实现基础配置和功能提供如验证码等
+|askit-monitor|HTTP请求记录组件|slf4j，logback，log4jdbc|可对HTTP请求的信息和本次请求所执行的数据库查询进行记录
+|askit-rest|RESTFul服务组件|SpringMVC|实现REST协议的支持，支持JSON，XML两种数据格式的输入和输出
+|askit-jpa|数据存储接口API|SpringDataJPA，HibernateJPA|支持大量常用的数据存取接口和查询、排序、分页等功能
+|askit-shiro|权限控制组件|ApacheShiro|对系统的安全、用户权限进行全面控制，支持分布式系统Session共享
+|askit-test|单元测试组件|SpringTest，TestNg，Mockito|采用优秀的测试组件方便、灵活的进行各种基于Spring的单元测试并提供测试报告
+|====
+
+#### 其它三方组件
+|====
+|功能|组件|备注
+|基础组件（字符、集合等扩展组件）|google.guava|https://code.google.com/p/guava-libraries/
+|日志记录|slf4j（logback）|(http://www.slf4j.org/) (http://logback.qos.ch/)
+|JSON，XML|jackson，fasterxml|http://wiki.fasterxml.com/JacksonHome
+|验证码|patchca|https://code.google.com/p/patchca/
+|====
+
+
+
+
+
+//spring 配置
+include::config.hbs[]
+//web.xml配置
+include::config1.hbs[]
+//其它组件配置
+include::config_.hbs[]
+
+//功能参考
+include::fun.md[]
+
+//控制器
+include::controller.hbs[]
+
+//JPA
+include::jpa.hbs[]
+
+//安全
+include::security.md[]
+
+//单元测试
+include::test.hbs[]
+
+
+
+include::other.hbs[]

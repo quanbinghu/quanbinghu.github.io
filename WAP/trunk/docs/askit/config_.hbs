@@ -1,0 +1,74 @@
+## 其它公共组件配置
+
+### Logback日志配置
+====
+官网参考： http://logback.qos.ch/
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds" > #<1>
+
+    <property name="APP_LOG_PERFIX" value="logs/log"/>  #<2>
+	
+    <jmxConfigurator/> #<3>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender"> #<4>
+        <encoder>
+            <pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <timestamp key="byday" datePattern="yyyyMMdd"/>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender"> #<5>
+        <file>${simpleapp.root}/${APP_LOG_PERFIX}-${byday}.log</file>  #<6>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${simpleapp.root}/${APP_LOG_PERFIX}.%i.log-${byday}.zip</fileNamePattern>
+            <maxHistory>90</maxHistory>
+            <minIndex>1</minIndex>
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>5MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <logger name="cn.bgonline.wap" level="TRACE"/> #<7>
+    <logger name="org.springframework" level="DEBUG"/>
+
+    <root level="INFO"> #<8>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+
+    <appender name="async" class="ch.qos.logback.classic.AsyncAppender"> #<9>
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的条数,该值会影响性能.默认值为256 -->
+        <queueSize>5000</queueSize>
+        <appender-ref ref="FILE"/>
+    </appender>
+    <logger name="HTTP-LOG" level="TRACE" additivity="false"> #<10>
+        <appender-ref ref="async"/>
+    </logger>
+
+</configuration>
+```
+
+<1> Logback配置，自动重新加载间隔30秒
+<2> 日志路径前缀，相对路径
+<3> 支持jmx在线调整和查看logback信息
+<4> 控制台输出适配
+<5> 文件输出适配，支持超过指定大小自动压缩
+<6> `${simpleapp.root}` 环境变量，本程序的根目录，参考 web.xml 
+<7> 根据日志名称指定日志记录级别或其它配置
+<8> 根日志记录设置，包括级别和输出适配等
+<9> 异步日志记录调用，解决大量日志记录阻塞的问题
+<10> 使用异步日志记录配置，并取消对根配置的继承，如果不设置 `additivity="false"` 会同时使用根配置的日志输出适配
+
+====
+
+### 属性类型覆盖配置

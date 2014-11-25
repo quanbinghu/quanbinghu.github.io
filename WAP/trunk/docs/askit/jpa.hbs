@@ -1,0 +1,115 @@
+## JPA数据持久接口
+
+### POM引用
+```xml
+<dependency>
+    <groupId>cn.bgonline.askit.modules</groupId>
+    <artifactId>askit-jpa</artifactId>
+    <version>${askit.version}</version>
+</dependency>
+```
+### 实体类ENTITY写法
+====
+```java
+
+@Entity
+@Table(name = "DEMO")
+@DynamicUpdate #<1>
+@JsonFilter("exclude") #<2>
+@SuppressWarnings("serial")
+public class DemoEntity extends JpaBaseEntity{ #<3>
+
+    private String name;
+    private String text;
+    private Demo2Entity demoEntity; #<4>
+    private List<Demo2Entity> demoEntityList; #<5>
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    @OneToOne(cascade = CascadeType.ALL) #<6>
+    public Demo2Entity getDemoEntity() {
+        return demoEntity;
+    }
+
+    public void setDemoEntity(Demo2Entity demoEntity) {
+        this.demoEntity = demoEntity;
+    }
+
+    @ManyToMany(cascade = CascadeType.ALL) #<7>
+    public List<Demo2Entity> getDemoEntityList() {
+        return demoEntityList;
+    }
+
+    public void setDemoEntityList(List<Demo2Entity> demoEntityList) {
+        this.demoEntityList = demoEntityList;
+    }
+}
+```
+<1> 启用动态更新，Hibernate支持的动态更新，只生成变化字段的SQL更新语句
+<2> 支持输出过滤，可以是 `@JsonFilter("exclude")` 或 `@JsonFilter("include")`
+<3> 继承自JpaBaseEntity，带有ID，createAt 等基本字段
+<4> 一对一表关联，以Entity为后缀
+<5> 多对多表关联，以EntityList为后缀
+<6> 一对一关联关键字一般用法，cascade表示联动操作； 取消外键 `@ForeignKey(name = "none")`
+<7> 多对多关联关键字一般用法，cascade表示联动操作； 取消外键 `@ForeignKey(name = "none", inverseName = "none")`
+====
+
+### 持久接口Repository的定义
+====
+```java
+public interface DemoRepository extends JpaExtRepository<DemoEntity, String> { #<1>
+
+}
+```
+<1> 继续 `JpaExtRepository` 关指定相应的Entity约束，Spirng-data-jpa会自动创建其实现类并带有基本的CRUD操作函数。
+====
+
+TIP: 关于Repository的Spring配置请参考link:#spring-jpa-配置[#spring-jpa-配置]的Spring JPA持久化相关配置第5部分。
+
+### 使用自定义查询语句
+```java
+public interface UserRepository extends JpaRepository<User, Long> {
+  @Query("select u from User u where u.emailAddress = ?1")
+  User findByEmailAddress(String emailAddress);
+}
+```
+官方参考： http://docs.spring.io/spring-data/jpa/docs/1.6.4.RELEASE/reference/htmlsingle/#jpa.query-methods.at-query
+
+#### 查询中使用分页等功能
+```java
+Page<User> findByLastname(String lastname, Pageable pageable);
+List<User> findByLastname(String lastname, Sort sort);
+List<User> findByLastname(String lastname, Pageable pageable);
+```
+`Pageable` 带有这个参考后自动解析分页参数。
+
+#### 在文件中使用查询语句
+_带添加，好像在文件中的语句会使用事务失效，是spring-data-jpa的bug，待在新版本中验证。_
+
+### 使用spring-data-jpa查询语法
+
+#### 一般实例
+```java
+public interface UserRepository extends Repository<User, Long> {
+  List<User> findByEmailAddressAndLastname(String emailAddress, String lastname); #<1>
+}
+```
+<1> 按Email、Address和Lastname查询
+
+#### 官方参考
+官方语义查询参考： +
+http://docs.spring.io/spring-data/jpa/docs/1.6.4.RELEASE/reference/htmlsingle/#jpa.query-methods.query-creation
